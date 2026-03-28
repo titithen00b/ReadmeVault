@@ -227,7 +227,11 @@ struct ProjectRowView: View {
 
             Spacer()
 
-            if !project.gitURL.isEmpty {
+            if project.isPinned {
+                Image(systemName: "pin.fill")
+                    .font(.system(size: 10))
+                    .foregroundColor(project.accentColor.opacity(0.7))
+            } else if !project.gitURL.isEmpty {
                 Image(systemName: "link")
                     .font(.system(size: 10))
                     .foregroundColor(.secondary.opacity(0.6))
@@ -251,8 +255,11 @@ struct ProjectRowView: View {
             }
         }
         .contextMenu {
-            Button("Modifier") {
-                // handled in detail view
+            Button {
+                store.togglePin(project)
+            } label: {
+                Label(project.isPinned ? "Désépingler" : "Épingler",
+                      systemImage: project.isPinned ? "pin.slash" : "pin")
             }
             Divider()
             Button("Supprimer", role: .destructive) {

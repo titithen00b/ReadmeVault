@@ -11,6 +11,7 @@ struct Project: Identifiable, Codable, Hashable {
     var color: String // hex string
     var createdAt: Date
     var updatedAt: Date
+    var isPinned: Bool = false
 
     init(
         name: String = "",
@@ -143,6 +144,8 @@ class ProjectStore: ObservableObject {
         if let tag = selectedTag {
             result = result.filter { $0.tags.contains(tag) }
         }
+        // Épinglés toujours en premier
+        result.sort { $0.isPinned && !$1.isPinned }
         switch sortOrder {
         case .nameAsc:    result.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         case .nameDesc:   result.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedDescending }
@@ -176,6 +179,16 @@ class ProjectStore: ObservableObject {
             }
         }
         save()
+    }
+
+    func togglePin(_ project: Project) {
+        if let idx = projects.firstIndex(where: { $0.id == project.id }) {
+            projects[idx].isPinned.toggle()
+            if selectedProject?.id == project.id {
+                selectedProject = projects[idx]
+            }
+        }
+        saveMetadata()
     }
 
     func delete(_ project: Project) {
