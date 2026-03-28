@@ -80,8 +80,11 @@ struct MenuBarView: View {
                     LazyVStack(spacing: 2) {
                         ForEach(filteredProjects) { project in
                             MenuBarProjectRow(project: project) {
-                                store.selectedProject = project
-                                openMainWindow()
+                                NotificationCenter.default.post(
+                                    name: .openMainWindow,
+                                    object: nil,
+                                    userInfo: ["projectID": project.id.uuidString]
+                                )
                             }
                         }
                     }

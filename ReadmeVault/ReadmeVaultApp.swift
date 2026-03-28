@@ -3,11 +3,13 @@ import SwiftUI
 @main
 struct ReadmeVaultApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @StateObject private var store = ProjectStore()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(appDelegate.store)
+                .environmentObject(store)
+                .onAppear { appDelegate.setStore(store) }
         }
         .windowStyle(.hiddenTitleBar)
         .windowToolbarStyle(.unified(showsTitle: false))
@@ -84,33 +86,41 @@ struct ReadmeVaultApp: App {
 
 // MARK: - AppDelegate
 
-@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    let store = ProjectStore()
     private var statusItem: NSStatusItem?
     private var popover: NSPopover?
     private var mainWindow: NSWindow?
+    private weak var projectStore: ProjectStore?
+
+    func setStore(_ store: ProjectStore) {
+        projectStore = store
+        applyStoreToPopover(store)
+    }
+
+    private func applyStoreToPopover(_ store: ProjectStore) {
+        guard let popover else { return }
+        let content = MenuBarView().environmentObject(store)
+        popover.contentViewController = NSHostingController(rootView: content)
+    }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupStatusItem()
 
-        // Capture la fenêtre principale après que SwiftUI l'a créée
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             if let window = NSApp.windows.first(where: { !($0 is NSPanel) }) {
                 window.isReleasedWhenClosed = false
-                self?.mainWindow = window
+                self.mainWindow = window
             }
         }
 
-        NotificationCenter.default.addObserver(forName: .openMainWindow, object: nil, queue: .main) { [weak self] _ in
-            self?.popover?.performClose(nil)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                NSApp.activate(ignoringOtherApps: true)
-                let window = self?.mainWindow ?? NSApp.windows.first(where: { !($0 is NSPanel) })
-                window?.isReleasedWhenClosed = false
-                window?.makeKeyAndOrderFront(nil)
-            }
+        NotificationCenter.default.addObserver(forName: .openMainWindow, object: nil, queue: .main) { [weak self] notification in
+            let projectID = (notification.userInfo?["projectID"] as? String).flatMap { UUID(uuidString: $0) }
+            self?.showMainWindow(selectingProjectID: projectID)
         }
+    }
+
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        return false
     }
 
     private func setupStatusItem() {
@@ -120,23 +130,38 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             button.action = #selector(togglePopover(_:))
             button.target = self
         }
-
-        let content = MenuBarView().environmentObject(store)
-        let controller = NSHostingController(rootView: content)
-
         let pop = NSPopover()
-        pop.contentViewController = controller
         pop.contentSize = CGSize(width: 280, height: 420)
         pop.behavior = .transient
         self.popover = pop
+        if let store = projectStore {
+            applyStoreToPopover(store)
+        }
+    }
+
+    private func showMainWindow(selectingProjectID projectID: UUID? = nil) {
+        popover?.performClose(nil)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            NSApp.activate(ignoringOtherApps: true)
+            let window = self.mainWindow ?? NSApp.windows.first(where: { !($0 is NSPanel) })
+            window?.isReleasedWhenClosed = false
+            window?.makeKeyAndOrderFront(nil)
+            if let id = projectID,
+               let project = self.projectStore?.projects.first(where: { $0.id == id }) {
+                self.projectStore?.selectedProject = project
+            }
+        }
     }
 
     @objc private func togglePopover(_ sender: NSStatusBarButton) {
-        guard let popover, let button = statusItem?.button else { return }
+        guard let popover else { return }
+        if popover.contentViewController == nil, let store = projectStore {
+            applyStoreToPopover(store)
+        }
         if popover.isShown {
             popover.performClose(nil)
         } else {
-            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+            popover.show(relativeTo: sender.bounds, of: sender, preferredEdge: .minY)
             popover.contentViewController?.view.window?.makeKey()
         }
     }
@@ -145,9 +170,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 // MARK: - Notifications
 
 extension Notification.Name {
-    static let addProject   = Notification.Name("addProject")
-    static let openFile     = Notification.Name("openFile")
-    static let importGitHub = Notification.Name("importGitHub")
-    static let focusSearch  = Notification.Name("focusSearch")
+    static let addProject     = Notification.Name("addProject")
+    static let openFile       = Notification.Name("openFile")
+    static let importGitHub   = Notification.Name("importGitHub")
+    static let focusSearch    = Notification.Name("focusSearch")
     static let openMainWindow = Notification.Name("openMainWindow")
 }

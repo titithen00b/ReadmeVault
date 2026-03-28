@@ -144,20 +144,20 @@ struct SidebarView: View {
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
                         .listRowInsets(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 8))
-                        .onDrag {
-                            if store.sortOrder == .manual {
+                        .ifManualSort(store.sortOrder == .manual) {
+                            $0.onDrag {
                                 draggingID = project.id
+                                return NSItemProvider(object: project.id.uuidString as NSString)
                             }
-                            return NSItemProvider(object: project.id.uuidString as NSString)
+                            .onDrop(of: [.plainText], delegate: ProjectDropDelegate(
+                                targetID: project.id,
+                                draggingID: $draggingID,
+                                store: store
+                            ))
                         }
-                        .onDrop(of: [.plainText], delegate: ProjectDropDelegate(
-                            targetID: project.id,
-                            draggingID: $draggingID,
-                            store: store
-                        ))
                 }
                 .listStyle(.plain)
-                .onChange(of: selectedIDs) { ids in
+                .onChange(of: selectedIDs) { _, ids in
                     if let id = ids.first,
                        let project = store.projects.first(where: { $0.id == id }) {
                         store.selectedProject = project
@@ -299,6 +299,7 @@ struct ProjectRowView: View {
             RoundedRectangle(cornerRadius: 10)
                 .strokeBorder(isSelected ? project.accentColor.opacity(0.4) : Color.clear, lineWidth: 1)
         )
+        .contentShape(Rectangle())
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.15)) {
                 isHovered = hovering
@@ -356,6 +357,13 @@ struct ProjectDropDelegate: DropDelegate {
         withAnimation { store.move(from: fromID, to: targetID) }
         draggingID = nil
         return true
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func ifManualSort<T: View>(_ condition: Bool, transform: (Self) -> T) -> some View {
+        if condition { transform(self) } else { self }
     }
 }
 
