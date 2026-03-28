@@ -10,6 +10,7 @@ struct ProjectDetailView: View {
     @State private var isRefreshing = false
     @State private var refreshError: String? = nil
     @State private var copied = false
+    @State private var exportPDFTrigger = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -179,6 +180,28 @@ struct ProjectDetailView: View {
                 }
                 Spacer()
 
+                // Share
+                ShareLink(item: project.readme, subject: Text(project.name)) {
+                    Label("Partager", systemImage: "square.and.arrow.up")
+                        .font(.system(size: 12))
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
+                .padding(.trailing, 8)
+
+                // Export PDF
+                if selectedTab == 0 {
+                    Button {
+                        exportPDFTrigger = true
+                    } label: {
+                        Label("Exporter PDF", systemImage: "arrow.down.doc")
+                            .font(.system(size: 12))
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.trailing, 8)
+                }
+
                 // Copy button
                 Button {
                     NSPasteboard.general.clearContents()
@@ -206,7 +229,7 @@ struct ProjectDetailView: View {
             Group {
                 switch selectedTab {
                 case 0:
-                    MarkdownRendererView(content: project.readme, accentColor: project.accentColor)
+                    MarkdownRendererView(content: project.readme, accentColor: project.accentColor, filename: project.name, exportTrigger: $exportPDFTrigger)
                 case 1:
                     RawMarkdownView(content: project.readme)
                 case 2:

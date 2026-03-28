@@ -1,21 +1,82 @@
 import SwiftUI
 import WebKit
+import UniformTypeIdentifiers
 
 struct MarkdownRendererView: NSViewRepresentable {
     let content: String
     let accentColor: Color
+    var filename: String = "README"
+    @Binding var exportTrigger: Bool
+
+    init(content: String, accentColor: Color, filename: String = "README", exportTrigger: Binding<Bool> = .constant(false)) {
+        self.content = content
+        self.accentColor = accentColor
+        self.filename = filename
+        self._exportTrigger = exportTrigger
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator() }
 
     func makeNSView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
         let webView = WKWebView(frame: .zero, configuration: config)
         webView.setValue(false, forKey: "drawsBackground")
+        webView.navigationDelegate = context.coordinator
+        context.coordinator.webView = webView
         return webView
     }
 
     func updateNSView(_ webView: WKWebView, context: Context) {
         let hex = colorToHex(accentColor)
         let html = generateHTML(markdown: content, accentHex: hex)
-        webView.loadHTMLString(html, baseURL: URL(string: "https://github.com/"))
+        if context.coordinator.lastHTML != html {
+            context.coordinator.lastHTML = html
+            context.coordinator.isLoaded = false
+            webView.loadHTMLString(html, baseURL: URL(string: "https://github.com/"))
+        }
+        context.coordinator.filename = filename
+        if exportTrigger {
+            DispatchQueue.main.async { self._exportTrigger.wrappedValue = false }
+            context.coordinator.triggerExport()
+        }
+    }
+
+    class Coordinator: NSObject, WKNavigationDelegate {
+        weak var webView: WKWebView?
+        var lastHTML = ""
+        var isLoaded = false
+        var pendingExport = false
+        var filename = "README"
+
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            isLoaded = true
+            if pendingExport {
+                pendingExport = false
+                exportPDF(webView)
+            }
+        }
+
+        func triggerExport() {
+            guard let webView = webView else { return }
+            if isLoaded { exportPDF(webView) } else { pendingExport = true }
+        }
+
+        private func exportPDF(_ webView: WKWebView) {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                let panel = NSSavePanel()
+                panel.allowedContentTypes = [.pdf]
+                panel.nameFieldStringValue = "\(self.filename).pdf"
+                guard panel.runModal() == .OK, let url = panel.url else { return }
+                let printInfo = NSPrintInfo()
+                printInfo.jobDisposition = .save
+                printInfo.dictionary().setValue(url, forKey: "NSPrintJobSavingURL")
+                let op = webView.printOperation(with: printInfo)
+                op.showsPrintPanel = false
+                op.showsProgressPanel = true
+                op.run()
+            }
+        }
     }
 
     private func colorToHex(_ color: Color) -> String {
