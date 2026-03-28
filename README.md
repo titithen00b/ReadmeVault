@@ -23,6 +23,10 @@
 - **Import fichier local** — Ouvre un fichier `.md` depuis le Finder (`⌘O`), le titre, la description et les tags sont détectés automatiquement
 - **Saisie manuelle** — Crée un projet et colle ton Markdown directement dans l'éditeur
 
+### Export & Partage
+- **Export PDF** — Exporte le README rendu en PDF via la boîte de dialogue impression
+- **Share sheet** — Partage le contenu Markdown via les services macOS (Mail, Messages, AirDrop…)
+
 ### Rendu Markdown
 - Rendu HTML via **WKWebView** avec parser Markdown maison
 - Support complet : titres, gras/italique, code inline et blocs, tableaux, listes, blockquotes, liens, images, badges shields.io
@@ -38,6 +42,7 @@
 - **Multi-sélection** — `⌘+clic` / `⇧+clic` pour sélectionner plusieurs projets, `⌫` pour suppression groupée
 - **Dupliquer** — clic droit → Dupliquer (`⌘D`) pour cloner un projet
 - **Date relative** — "il y a 2j" affiché sous chaque projet dans la sidebar
+- **Glisser-déposer** — réordonne les projets manuellement (mode tri "Manuel")
 - **3 onglets** par projet : README rendu / Markdown brut / Informations
 - **Compteur** — nombre de mots, caractères et lignes dans l'onglet Infos
 
@@ -196,9 +201,7 @@ struct Project: Identifiable, Codable, Hashable {
 ## Pistes d'évolution
 
 - [ ] Support des dépôts GitHub privés (token OAuth)
-- [ ] Export PDF d'un README
 - [ ] Sync iCloud (remplacer FileManager local par container iCloud)
-- [ ] Glisser-déposer pour réordonner les projets
 - [ ] Raccourci menu bar (NSStatusItem)
 - [ ] Mode présentation plein écran
 - [ ] Import depuis GitLab / Bitbucket
