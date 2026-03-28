@@ -16,6 +16,7 @@
 		A007 /* ProjectFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B007 /* ProjectFormView.swift */; };
 		A008 /* ImportGitHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B008 /* ImportGitHubView.swift */; };
 		A010 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B010 /* AboutView.swift */; };
+		A011 /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B011 /* HelpView.swift */; };
 		A009 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B009 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -29,6 +30,7 @@
 		B007 /* ProjectFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectFormView.swift; sourceTree = "<group>"; };
 		B008 /* ImportGitHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportGitHubView.swift; sourceTree = "<group>"; };
 		B010 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		B011 /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
 		B009 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		PROD /* ReadmeVault.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReadmeVault.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -64,6 +66,7 @@
 				B007 /* ProjectFormView.swift */,
 				B008 /* ImportGitHubView.swift */,
 				B010 /* AboutView.swift */,
+				B011 /* HelpView.swift */,
 				B009 /* Assets.xcassets */,
 			);
 			path = ReadmeVault;
@@ -156,6 +159,7 @@
 				A007 /* ProjectFormView.swift in Sources */,
 				A008 /* ImportGitHubView.swift in Sources */,
 				A010 /* AboutView.swift in Sources */,
+				A011 /* HelpView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -41,6 +41,13 @@ struct ReadmeVaultApp: App {
                 .keyboardShortcut("f", modifiers: .command)
             }
 
+            CommandGroup(replacing: .help) {
+                Button("Aide ReadmeVault") {
+                    HelpWindowController.shared.show()
+                }
+                .keyboardShortcut("/", modifiers: .command)
+            }
+
             CommandGroup(replacing: .appTermination) {
                 Button("Désinstaller ReadmeVault…") {
                     let alert = NSAlert()
