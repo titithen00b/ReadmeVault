@@ -326,8 +326,9 @@ struct ProjectInfoView: View {
 
                 InfoCard(title: "README", accentColor: project.accentColor) {
                     VStack(alignment: .leading, spacing: 12) {
-                        InfoRow(label: "Taille", value: "\(project.readme.count) caractères")
-                        InfoRow(label: "Lignes", value: "\(project.readme.split(separator: "\n").count) lignes")
+                        InfoRow(label: "Caractères", value: "\(project.readme.count)")
+                        InfoRow(label: "Mots", value: "\(project.readme.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }.count)")
+                        InfoRow(label: "Lignes", value: "\(project.readme.split(separator: "\n").count)")
                     }
                 }
             }
