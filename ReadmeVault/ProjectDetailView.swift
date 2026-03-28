@@ -9,6 +9,7 @@ struct ProjectDetailView: View {
     @State private var showDeleteConfirm = false
     @State private var isRefreshing = false
     @State private var refreshError: String? = nil
+    @State private var copied = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -182,13 +183,19 @@ struct ProjectDetailView: View {
                 Button {
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(project.readme, forType: .string)
+                    withAnimation { copied = true }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        withAnimation { copied = false }
+                    }
                 } label: {
-                    Label("Copier README", systemImage: "doc.on.doc")
+                    Label(copied ? "Copié !" : "Copier README",
+                          systemImage: copied ? "checkmark" : "doc.on.doc")
                         .font(.system(size: 12))
-                        .foregroundColor(.secondary)
+                        .foregroundColor(copied ? .green : .secondary)
                 }
                 .buttonStyle(.plain)
                 .padding(.trailing, 16)
+                .animation(.easeInOut(duration: 0.2), value: copied)
             }
             .padding(.horizontal, 8)
             .background(Color(NSColor.controlBackgroundColor).opacity(0.5))

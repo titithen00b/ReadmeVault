@@ -35,7 +35,8 @@ Icon
 .vscode/
 
 # Claude
-.claude
+.claude/
 CLAUDE.md
 icon.svg
-incone.png
+icone.png
+
