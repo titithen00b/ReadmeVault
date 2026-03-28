@@ -258,6 +258,9 @@ struct ProjectRowView: View {
                         .foregroundColor(.secondary)
                         .lineLimit(1)
                 }
+                Text(project.updatedAt.relativeFormatted)
+                    .font(.system(size: 10))
+                    .foregroundColor(.secondary.opacity(0.6))
             }
 
             Spacer()
@@ -295,6 +298,28 @@ struct ProjectRowView: View {
             } label: {
                 Label(project.isPinned ? "Désépingler" : "Épingler",
                       systemImage: project.isPinned ? "pin.slash" : "pin")
+            }
+            Button {
+                store.duplicate(project)
+            } label: {
+                Label("Dupliquer", systemImage: "plus.square.on.square")
+            }
+            .keyboardShortcut("d", modifiers: .command)
+            if !project.gitURL.isEmpty {
+                Divider()
+                Button {
+                    if let url = URL(string: project.gitURL) {
+                        NSWorkspace.shared.open(url)
+                    }
+                } label: {
+                    Label("Ouvrir sur GitHub", systemImage: "arrow.up.right.square")
+                }
+                Button {
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(project.gitURL, forType: .string)
+                } label: {
+                    Label("Copier l'URL GitHub", systemImage: "link")
+                }
             }
             Divider()
             Button("Supprimer", role: .destructive) {
