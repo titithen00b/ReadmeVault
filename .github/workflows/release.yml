@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Créer une release
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Sélection Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app
+
+      - name: Build Release
+        run: |
+          xcodebuild \
+            -project ReadmeVault.xcodeproj \
+            -scheme ReadmeVault \
+            -configuration Release \
+            -destination 'platform=macOS' \
+            -archivePath build/ReadmeVault.xcarchive \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            archive
+
+      - name: Créer le .app
+        run: |
+          xcodebuild \
+            -exportArchive \
+            -archivePath build/ReadmeVault.xcarchive \
+            -exportPath build/export \
+            -exportOptionsPlist ExportOptions.plist || true
+          cd build/ReadmeVault.xcarchive/Products/Applications
+          zip -r ../../../../ReadmeVault.zip ReadmeVault.app
+
+      - name: Publier la release GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ReadmeVault ${{ github.ref_name }}
+          body: |
+            ## ReadmeVault ${{ github.ref_name }}
+
+            ### Installation
+            1. Télécharge `ReadmeVault.zip`
+            2. Décompresse et glisse `ReadmeVault.app` dans `/Applications`
+            3. Clic droit → Ouvrir (première fois, pour bypasser Gatekeeper)
+          files: ReadmeVault.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
