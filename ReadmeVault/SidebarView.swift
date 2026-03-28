@@ -67,7 +67,7 @@ struct SidebarView: View {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(.secondary)
                     .font(.system(size: 13))
-                TextField("Rechercher...", text: $store.searchText)
+                TextField("Rechercher dans tous les READMEs...", text: $store.searchText)
                     .textFieldStyle(.plain)
                     .font(.system(size: 13))
                 if !store.searchText.isEmpty {
