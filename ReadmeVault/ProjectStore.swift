@@ -81,12 +81,22 @@ private struct ProjectMetadata: Codable {
     }
 }
 
+enum SortOrder: String, CaseIterable {
+    case nameAsc    = "Nom (A→Z)"
+    case nameDesc   = "Nom (Z→A)"
+    case updatedDesc = "Modifié récemment"
+    case updatedAsc  = "Modifié anciennement"
+    case sizeDesc   = "Taille (grand→petit)"
+    case sizeAsc    = "Taille (petit→grand)"
+}
+
 @MainActor
 class ProjectStore: ObservableObject {
     @Published var projects: [Project] = []
     @Published var selectedProject: Project?
     @Published var searchText: String = ""
     @Published var selectedTag: String? = nil
+    @Published var sortOrder: SortOrder = .updatedDesc
 
     // MARK: - Chemins de stockage
 
@@ -131,6 +141,14 @@ class ProjectStore: ObservableObject {
         }
         if let tag = selectedTag {
             result = result.filter { $0.tags.contains(tag) }
+        }
+        switch sortOrder {
+        case .nameAsc:    result.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        case .nameDesc:   result.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedDescending }
+        case .updatedDesc: result.sort { $0.updatedAt > $1.updatedAt }
+        case .updatedAsc:  result.sort { $0.updatedAt < $1.updatedAt }
+        case .sizeDesc:   result.sort { $0.readme.count > $1.readme.count }
+        case .sizeAsc:    result.sort { $0.readme.count < $1.readme.count }
         }
         return result
     }

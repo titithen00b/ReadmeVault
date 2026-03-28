@@ -25,6 +25,30 @@ struct SidebarView: View {
                         .foregroundColor(.primary)
                 }
                 Spacer()
+                Menu {
+                    ForEach(SortOrder.allCases, id: \.self) { order in
+                        Button {
+                            store.sortOrder = order
+                        } label: {
+                            HStack {
+                                Text(order.rawValue)
+                                if store.sortOrder == order {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                        }
+                    }
+                } label: {
+                    Image(systemName: "arrow.up.arrow.down")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(.secondary)
+                        .padding(6)
+                        .background(RoundedRectangle(cornerRadius: 6).fill(Color(NSColor.controlBackgroundColor)))
+                }
+                .menuStyle(.borderlessButton)
+                .fixedSize()
+                .help("Trier les projets")
+
                 Text("\(store.projects.count)")
                     .font(.system(size: 11, weight: .bold))
                     .foregroundColor(.white)
