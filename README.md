@@ -32,7 +32,10 @@
 ### Organisation
 - **Tags** — ajout libre, filtre par tag en sidebar
 - **Couleur par projet** — palette de 12 couleurs
-- **Recherche** — filtre en temps réel sur nom, description et tags (`⌘F`)
+- **Recherche plein texte** — filtre en temps réel sur nom, description, tags et contenu README (`⌘F`)
+- **Tri** — par nom, date de modification ou taille du README
+- **Épingler** — projets épinglés toujours en tête de liste (clic droit → Épingler)
+- **Multi-sélection** — `⌘+clic` / `⇧+clic` pour sélectionner plusieurs projets, `⌫` pour suppression groupée
 - **3 onglets** par projet : README rendu / Markdown brut / Informations
 
 ### Stockage
@@ -102,7 +105,7 @@ make uninstall # Supprime l'app + toutes les données
 
 | Workflow | Déclencheur | Action |
 |----------|-------------|--------|
-| `build.yml` | Push / PR sur `main` | Vérifie que le projet compile |
+| `build.yml` | Push / PR sur `master` | Vérifie que le projet compile |
 | `release.yml` | Push d'un tag `v*` | Archive + publie le `.app` sur GitHub Releases |
 
 Pour créer une nouvelle release :
@@ -143,6 +146,7 @@ struct Project: Identifiable, Codable, Hashable {
     var color: String         // Couleur hex ex: "#6C63FF"
     var createdAt: Date
     var updatedAt: Date
+    var isPinned: Bool        // Épinglé en tête de liste
 }
 ```
 
@@ -167,6 +171,7 @@ struct Project: Identifiable, Codable, Hashable {
 | `⌘I` | Importer depuis GitHub |
 | `⌘F` | Rechercher |
 | `⌘↩` | Enregistrer (dans le formulaire) |
+| `⌫` | Supprimer le(s) projet(s) sélectionné(s) |
 | `⎋` | Annuler / Fermer |
 
 ---
