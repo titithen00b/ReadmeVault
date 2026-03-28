@@ -89,25 +89,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let store = ProjectStore()
     private var statusItem: NSStatusItem?
     private var popover: NSPopover?
+    private var mainWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupStatusItem()
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleOpenMainWindow),
-            name: .openMainWindow,
-            object: nil
-        )
-    }
 
-    @objc private func handleOpenMainWindow() {
-        popover?.performClose(nil)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-            NSApp.activate(ignoringOtherApps: true)
-            NSApp.windows
-                .filter { !($0 is NSPanel) && $0.canBecomeMain }
-                .first?
-                .makeKeyAndOrderFront(nil)
+        // Capture la fenêtre principale après que SwiftUI l'a créée
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            if let window = NSApp.windows.first(where: { !($0 is NSPanel) }) {
+                window.isReleasedWhenClosed = false
+                self?.mainWindow = window
+            }
+        }
+
+        NotificationCenter.default.addObserver(forName: .openMainWindow, object: nil, queue: .main) { [weak self] _ in
+            self?.popover?.performClose(nil)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                NSApp.activate(ignoringOtherApps: true)
+                let window = self?.mainWindow ?? NSApp.windows.first(where: { !($0 is NSPanel) })
+                window?.isReleasedWhenClosed = false
+                window?.makeKeyAndOrderFront(nil)
+            }
         }
     }
 
