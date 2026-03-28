@@ -3,15 +3,11 @@ import SwiftUI
 @main
 struct ReadmeVaultApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    @StateObject private var store = ProjectStore()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(store)
-                .onAppear {
-                    appDelegate.setup(store: store)
-                }
+                .environmentObject(appDelegate.store)
         }
         .windowStyle(.hiddenTitleBar)
         .windowToolbarStyle(.unified(showsTitle: false))
@@ -88,13 +84,17 @@ struct ReadmeVaultApp: App {
 
 // MARK: - AppDelegate
 
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    let store = ProjectStore()
     private var statusItem: NSStatusItem?
     private var popover: NSPopover?
 
-    func setup(store: ProjectStore) {
-        guard statusItem == nil else { return }
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        setupStatusItem()
+    }
 
+    private func setupStatusItem() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         if let button = statusItem?.button {
             button.image = NSImage(systemSymbolName: "doc.text.magnifyingglass", accessibilityDescription: "ReadmeVault")
@@ -104,7 +104,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let content = MenuBarView().environmentObject(store)
         let controller = NSHostingController(rootView: content)
-        controller.view.frame.size = CGSize(width: 280, height: 420)
 
         let pop = NSPopover()
         pop.contentViewController = controller
