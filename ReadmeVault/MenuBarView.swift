@@ -126,6 +126,11 @@ struct MenuBarView: View {
             .padding(.vertical, 8)
         }
         .frame(width: 280)
+        .onAppear {
+            DispatchQueue.main.async {
+                NSApp.activate(ignoringOtherApps: true)
+            }
+        }
     }
 
     private func openMainWindow() {
