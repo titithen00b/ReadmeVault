@@ -92,6 +92,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupStatusItem()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleOpenMainWindow),
+            name: .openMainWindow,
+            object: nil
+        )
+    }
+
+    @objc private func handleOpenMainWindow() {
+        popover?.performClose(nil)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            NSApp.activate(ignoringOtherApps: true)
+            NSApp.windows
+                .filter { !($0 is NSPanel) && $0.canBecomeMain }
+                .first?
+                .makeKeyAndOrderFront(nil)
+        }
     }
 
     private func setupStatusItem() {
@@ -130,4 +147,5 @@ extension Notification.Name {
     static let openFile     = Notification.Name("openFile")
     static let importGitHub = Notification.Name("importGitHub")
     static let focusSearch  = Notification.Name("focusSearch")
+    static let openMainWindow = Notification.Name("openMainWindow")
 }

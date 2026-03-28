@@ -129,11 +129,7 @@ struct MenuBarView: View {
     }
 
     private func openMainWindow() {
-        NSApp.activate(ignoringOtherApps: true)
-        NSApp.windows
-            .filter { $0.canBecomeMain }
-            .first?
-            .makeKeyAndOrderFront(nil)
+        NotificationCenter.default.post(name: .openMainWindow, object: nil)
     }
 }
 
