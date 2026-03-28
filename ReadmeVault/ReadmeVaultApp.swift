@@ -58,17 +58,14 @@ struct ReadmeVaultApp: App {
                     alert.addButton(withTitle: "Annuler")
 
                     if alert.runModal() == .alertFirstButtonReturn {
-                        // Supprimer les données
                         let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
                             .appendingPathComponent("ReadmeVault")
                         try? FileManager.default.removeItem(at: appSupport)
 
-                        // Supprimer les préférences
                         let prefs = FileManager.default.homeDirectoryForCurrentUser
                             .appendingPathComponent("Library/Preferences/ReadmeVault.plist")
                         try? FileManager.default.removeItem(at: prefs)
 
-                        // Supprimer l'app elle-même
                         let appURL = Bundle.main.bundleURL
                         NSWorkspace.shared.recycle([appURL]) { _, _ in
                             NSApp.terminate(nil)
@@ -82,6 +79,14 @@ struct ReadmeVaultApp: App {
                 .keyboardShortcut("q", modifiers: .command)
             }
         }
+
+        MenuBarExtra {
+            MenuBarView()
+                .environmentObject(store)
+        } label: {
+            Image(systemName: "doc.text.magnifyingglass")
+        }
+        .menuBarExtraStyle(.window)
     }
 }
 
