@@ -201,6 +201,18 @@ class ProjectStore: ObservableObject {
         saveMetadata()
     }
 
+    func duplicate(_ project: Project) {
+        var copy = project
+        copy.id = UUID()
+        copy.name = "\(project.name) (copie)"
+        copy.createdAt = Date()
+        copy.updatedAt = Date()
+        copy.isPinned = false
+        projects.append(copy)
+        selectedProject = copy
+        save()
+    }
+
     func deleteMultiple(_ ids: Set<UUID>) {
         for id in ids {
             projects.removeAll { $0.id == id }
@@ -426,6 +438,17 @@ struct GitHubReadme: Codable {
 }
 
 // MARK: - Extension Color
+
+// MARK: - Extension Date
+
+extension Date {
+    var relativeFormatted: String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .abbreviated
+        formatter.locale = Locale(identifier: "fr_FR")
+        return formatter.localizedString(for: self, relativeTo: Date())
+    }
+}
 
 extension Color {
     init?(hex: String) {
