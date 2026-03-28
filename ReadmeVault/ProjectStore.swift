@@ -89,6 +89,7 @@ enum SortOrder: String, CaseIterable {
     case updatedAsc  = "Modifié anciennement"
     case sizeDesc   = "Taille (grand→petit)"
     case sizeAsc    = "Taille (petit→grand)"
+    case manual     = "Manuel (glisser-déposer)"
 }
 
 @MainActor
@@ -153,6 +154,7 @@ class ProjectStore: ObservableObject {
         case .updatedAsc:  result.sort { $0.updatedAt < $1.updatedAt }
         case .sizeDesc:   result.sort { $0.readme.count > $1.readme.count }
         case .sizeAsc:    result.sort { $0.readme.count < $1.readme.count }
+        case .manual:     break // ordre du tableau
         }
         return result
     }
@@ -198,6 +200,15 @@ class ProjectStore: ObservableObject {
         }
         // Supprimer le fichier README associé
         try? FileManager.default.removeItem(at: readmeURL(for: project.id))
+        saveMetadata()
+    }
+
+    func move(from sourceID: UUID, to destinationID: UUID) {
+        guard let fromIndex = projects.firstIndex(where: { $0.id == sourceID }),
+              let toIndex = projects.firstIndex(where: { $0.id == destinationID }),
+              fromIndex != toIndex else { return }
+        projects.move(fromOffsets: IndexSet(integer: fromIndex),
+                      toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex)
         saveMetadata()
     }
 

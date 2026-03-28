@@ -6,6 +6,7 @@ struct SidebarView: View {
     @Binding var showImportSheet: Bool
     @Binding var showFileImportPicker: Bool
     @State private var selectedIDs: Set<UUID> = []
+    @State private var draggingID: UUID? = nil
 
     private func deleteSelected() {
         let count = selectedIDs.count
@@ -143,6 +144,17 @@ struct SidebarView: View {
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
                         .listRowInsets(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 8))
+                        .onDrag {
+                            if store.sortOrder == .manual {
+                                draggingID = project.id
+                            }
+                            return NSItemProvider(object: project.id.uuidString as NSString)
+                        }
+                        .onDrop(of: [.plainText], delegate: ProjectDropDelegate(
+                            targetID: project.id,
+                            draggingID: $draggingID,
+                            store: store
+                        ))
                 }
                 .listStyle(.plain)
                 .onChange(of: selectedIDs) { ids in
@@ -326,6 +338,24 @@ struct ProjectRowView: View {
                 store.delete(project)
             }
         }
+    }
+}
+
+struct ProjectDropDelegate: DropDelegate {
+    let targetID: UUID
+    @Binding var draggingID: UUID?
+    let store: ProjectStore
+
+    func dropUpdated(info: DropInfo) -> DropProposal? {
+        DropProposal(operation: .move)
+    }
+
+    func performDrop(info: DropInfo) -> Bool {
+        guard let fromID = draggingID, fromID != targetID,
+              store.sortOrder == .manual else { return false }
+        withAnimation { store.move(from: fromID, to: targetID) }
+        draggingID = nil
+        return true
     }
 }
 
