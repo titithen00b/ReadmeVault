@@ -36,7 +36,10 @@
 - **Tri** — par nom, date de modification ou taille du README
 - **Épingler** — projets épinglés toujours en tête de liste (clic droit → Épingler)
 - **Multi-sélection** — `⌘+clic` / `⇧+clic` pour sélectionner plusieurs projets, `⌫` pour suppression groupée
+- **Dupliquer** — clic droit → Dupliquer (`⌘D`) pour cloner un projet
+- **Date relative** — "il y a 2j" affiché sous chaque projet dans la sidebar
 - **3 onglets** par projet : README rendu / Markdown brut / Informations
+- **Compteur** — nombre de mots, caractères et lignes dans l'onglet Infos
 
 ### Stockage
 - Données stockées dans `~/Library/Application Support/ReadmeVault/`
@@ -169,6 +172,7 @@ struct Project: Identifiable, Codable, Hashable {
 | `⌘N` | Nouveau projet |
 | `⌘O` | Ouvrir un fichier README local |
 | `⌘I` | Importer depuis GitHub |
+| `⌘D` | Dupliquer le projet sélectionné |
 | `⌘F` | Rechercher |
 | `⌘↩` | Enregistrer (dans le formulaire) |
 | `⌫` | Supprimer le(s) projet(s) sélectionné(s) |
