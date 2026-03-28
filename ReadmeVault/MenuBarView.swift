@@ -95,38 +95,37 @@ struct MenuBarView: View {
 
             // Bottom actions
             HStack(spacing: 6) {
-                Label("Ouvrir", systemImage: "macwindow")
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(.secondary)
-                    .contentShape(Rectangle())
-                    .onTapGesture { openMainWindow() }
+                Button {
+                    openMainWindow()
+                } label: {
+                    Label("Ouvrir", systemImage: "macwindow")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
 
                 Spacer()
 
-                Image(systemName: "plus")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(.white)
-                    .frame(width: 22, height: 22)
-                    .background(Color(hex: "#6C63FF")!)
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        openMainWindow()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                            NotificationCenter.default.post(name: .addProject, object: nil)
-                        }
+                Button {
+                    openMainWindow()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                        NotificationCenter.default.post(name: .addProject, object: nil)
                     }
-                    .help("Nouveau projet")
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(width: 22, height: 22)
+                        .background(Color(hex: "#6C63FF")!)
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                }
+                .buttonStyle(.plain)
+                .help("Nouveau projet")
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
         }
         .frame(width: 280)
-        .onAppear {
-            DispatchQueue.main.async {
-                NSApp.activate(ignoringOtherApps: true)
-            }
-        }
     }
 
     private func openMainWindow() {
@@ -144,49 +143,51 @@ private struct MenuBarProjectRow: View {
     @State private var isHovered = false
 
     var body: some View {
-        HStack(spacing: 8) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(LinearGradient(
-                        colors: [project.accentColor, project.accentColor.opacity(0.7)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ))
-                    .frame(width: 28, height: 28)
-                Text(project.initials)
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
-            }
+        Button(action: onTap) {
+            HStack(spacing: 8) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(LinearGradient(
+                            colors: [project.accentColor, project.accentColor.opacity(0.7)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ))
+                        .frame(width: 28, height: 28)
+                    Text(project.initials)
+                        .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                }
 
-            VStack(alignment: .leading, spacing: 1) {
-                Text(project.name)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(.primary)
-                    .lineLimit(1)
-                if !project.description.isEmpty {
-                    Text(project.description)
-                        .font(.system(size: 10))
-                        .foregroundColor(.secondary)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(project.name)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(.primary)
                         .lineLimit(1)
+                    if !project.description.isEmpty {
+                        Text(project.description)
+                            .font(.system(size: 10))
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
+                }
+
+                Spacer()
+
+                if project.isPinned {
+                    Image(systemName: "pin.fill")
+                        .font(.system(size: 9))
+                        .foregroundColor(project.accentColor.opacity(0.7))
                 }
             }
-
-            Spacer()
-
-            if project.isPinned {
-                Image(systemName: "pin.fill")
-                    .font(.system(size: 9))
-                    .foregroundColor(project.accentColor.opacity(0.7))
-            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isHovered ? Color(NSColor.controlBackgroundColor) : Color.clear)
+            )
+            .contentShape(Rectangle())
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 6)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(isHovered ? Color(NSColor.controlBackgroundColor) : Color.clear)
-        )
-        .contentShape(Rectangle())
-        .onTapGesture(perform: onTap)
+        .buttonStyle(.plain)
         .onHover { isHovered = $0 }
     }
 }
