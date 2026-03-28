@@ -36,7 +36,7 @@
 - **3 onglets** par projet : README rendu / Markdown brut / Informations
 
 ### Stockage
-- Données stockées dans `~/Documents/ReadmeVault/`
+- Données stockées dans `~/Library/Application Support/ReadmeVault/`
 - `projects.json` pour les métadonnées (léger, chargement rapide)
 - `readmes/<uuid>.md` pour chaque README (pas de limite de taille)
 - Migration automatique depuis l'ancien stockage UserDefaults au premier lancement
@@ -86,11 +86,12 @@ make run
 ### Commandes disponibles
 
 ```bash
-make run      # Build Debug + lance l'app
-make build    # Build sans lancer
-make open     # Rouvre sans rebuild
-make clean    # Nettoie DerivedData
-make install  # Copie dans /Applications
+make run       # Build Debug + lance l'app
+make build     # Build sans lancer
+make open      # Rouvre sans rebuild
+make clean     # Nettoie DerivedData
+make install   # Copie dans /Applications
+make uninstall # Supprime l'app + toutes les données
 ```
 
 > **Note** — À la première ouverture dans Xcode, va dans le target `ReadmeVault` → *Signing & Capabilities* → sélectionne ton compte Apple (gratuit suffit).
@@ -148,7 +149,7 @@ struct Project: Identifiable, Codable, Hashable {
 ### Stockage sur disque
 
 ```
-~/Documents/ReadmeVault/
+~/Library/Application Support/ReadmeVault/
 ├── projects.json          ← métadonnées de tous les projets (sans le contenu README)
 └── readmes/
     ├── <uuid>.md          ← README de chaque projet

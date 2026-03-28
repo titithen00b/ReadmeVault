@@ -40,6 +40,40 @@ struct ReadmeVaultApp: App {
                 }
                 .keyboardShortcut("f", modifiers: .command)
             }
+
+            CommandGroup(replacing: .appTermination) {
+                Button("Désinstaller ReadmeVault…") {
+                    let alert = NSAlert()
+                    alert.messageText = "Désinstaller ReadmeVault ?"
+                    alert.informativeText = "Toutes vos données (projets, READMEs) seront supprimées définitivement. Cette action est irréversible."
+                    alert.alertStyle = .critical
+                    alert.addButton(withTitle: "Désinstaller")
+                    alert.addButton(withTitle: "Annuler")
+
+                    if alert.runModal() == .alertFirstButtonReturn {
+                        // Supprimer les données
+                        let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+                            .appendingPathComponent("ReadmeVault")
+                        try? FileManager.default.removeItem(at: appSupport)
+
+                        // Supprimer les préférences
+                        let prefs = FileManager.default.homeDirectoryForCurrentUser
+                            .appendingPathComponent("Library/Preferences/ReadmeVault.plist")
+                        try? FileManager.default.removeItem(at: prefs)
+
+                        // Supprimer l'app elle-même
+                        let appURL = Bundle.main.bundleURL
+                        NSWorkspace.shared.recycle([appURL]) { _, _ in
+                            NSApp.terminate(nil)
+                        }
+                    }
+                }
+                Divider()
+                Button("Quitter ReadmeVault") {
+                    NSApp.terminate(nil)
+                }
+                .keyboardShortcut("q", modifiers: .command)
+            }
         }
     }
 }

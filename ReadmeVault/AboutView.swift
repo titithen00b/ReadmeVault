@@ -65,7 +65,7 @@ struct AboutView: View {
                 Divider().padding(.horizontal, 20)
                 AboutInfoRow(label: "Technologie", value: "SwiftUI · macOS 14+")
                 Divider().padding(.horizontal, 20)
-                AboutInfoRow(label: "Stockage", value: "Local · Documents/ReadmeVault/")
+                AboutInfoRow(label: "Stockage", value: "Local · Library/Application Support/ReadmeVault/")
                 Divider().padding(.horizontal, 20)
                 AboutInfoRow(label: "Licence", value: "MIT")
             }

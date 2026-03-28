@@ -108,6 +108,39 @@ install: release ## Installe l'app dans /Applications
 	echo "\033[1;32m✓ ReadmeVault installé dans /Applications !\033[0m"
 
 # -------------------------------------------------------
+.PHONY: uninstall
+uninstall: ## Désinstalle complètement ReadmeVault
+	@echo "\033[1;33m⚑ Désinstallation de ReadmeVault...\033[0m"
+	@# App
+	@if [ -d "/Applications/ReadmeVault.app" ]; then \
+		rm -rf "/Applications/ReadmeVault.app"; \
+		echo "  \033[1;32m✓ App supprimée de /Applications\033[0m"; \
+	else \
+		echo "  \033[0;90m– App absente de /Applications\033[0m"; \
+	fi
+	@# Données
+	@DATA="$$HOME/Library/Application Support/ReadmeVault"; \
+	if [ -d "$$DATA" ]; then \
+		rm -rf "$$DATA"; \
+		echo "  \033[1;32m✓ Données supprimées (Application Support)\033[0m"; \
+	else \
+		echo "  \033[0;90m– Aucune donnée trouvée\033[0m"; \
+	fi
+	@# Préférences
+	@PLIST="$$HOME/Library/Preferences/ReadmeVault.plist"; \
+	if [ -f "$$PLIST" ]; then \
+		rm -f "$$PLIST"; \
+		echo "  \033[1;32m✓ Préférences supprimées\033[0m"; \
+	fi
+	@# Cache
+	@CACHE="$$HOME/Library/Caches/ReadmeVault"; \
+	if [ -d "$$CACHE" ]; then \
+		rm -rf "$$CACHE"; \
+		echo "  \033[1;32m✓ Cache supprimé\033[0m"; \
+	fi
+	@echo "\033[1;32m✓ ReadmeVault complètement désinstallé.\033[0m"
+
+# -------------------------------------------------------
 .PHONY: xcpretty-check
 xcpretty-check: ## Installe xcpretty si absent (logs plus lisibles)
 	@which xcpretty > /dev/null 2>&1 || (echo "💡 Installe xcpretty pour de meilleurs logs : gem install xcpretty" )

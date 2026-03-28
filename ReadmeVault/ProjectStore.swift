@@ -91,7 +91,7 @@ class ProjectStore: ObservableObject {
     // MARK: - Chemins de stockage
 
     private var baseURL: URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("ReadmeVault", isDirectory: true)
     }
 
