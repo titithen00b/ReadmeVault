@@ -7,6 +7,8 @@ struct ProjectDetailView: View {
     @State private var showEditSheet = false
     @State private var selectedTab = 0
     @State private var showDeleteConfirm = false
+    @State private var isRefreshing = false
+    @State private var refreshError: String? = nil
 
     var body: some View {
         VStack(spacing: 0) {
@@ -61,7 +63,7 @@ struct ProjectDetailView: View {
                     }
                 }
 
-                // GitHub link
+                // GitHub link + refresh
                 if !project.gitURL.isEmpty {
                     Button {
                         if let url = URL(string: project.gitURL) {
@@ -83,6 +85,40 @@ struct ProjectDetailView: View {
                         )
                     }
                     .buttonStyle(.plain)
+
+                    // Refresh depuis GitHub
+                    if project.gitURL.contains("github.com") {
+                        Button {
+                            isRefreshing = true
+                            refreshError = nil
+                            Task {
+                                do {
+                                    let updated = try await store.importFromGitHub(url: project.gitURL)
+                                    var refreshed = project
+                                    refreshed.readme = updated.readme
+                                    refreshed.description = updated.description
+                                    refreshed.tags = updated.tags
+                                    store.update(refreshed)
+                                } catch {
+                                    refreshError = error.localizedDescription
+                                }
+                                isRefreshing = false
+                            }
+                        } label: {
+                            Image(systemName: isRefreshing ? "arrow.triangle.2.circlepath" : "arrow.clockwise")
+                                .font(.system(size: 13, weight: .medium))
+                                .rotationEffect(.degrees(isRefreshing ? 360 : 0))
+                                .animation(isRefreshing ? .linear(duration: 1).repeatForever(autoreverses: false) : .default, value: isRefreshing)
+                                .padding(8)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(Color(NSColor.controlBackgroundColor))
+                                )
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isRefreshing)
+                        .help("Rafraîchir le README depuis GitHub")
+                    }
                 }
 
                 // Edit
@@ -175,6 +211,14 @@ struct ProjectDetailView: View {
         }
         .sheet(isPresented: $showEditSheet) {
             ProjectFormView(mode: .edit(project))
+        }
+        .alert("Erreur de rafraîchissement", isPresented: .init(
+            get: { refreshError != nil },
+            set: { if !$0 { refreshError = nil } }
+        )) {
+            Button("OK", role: .cancel) { refreshError = nil }
+        } message: {
+            Text(refreshError ?? "")
         }
         .alert("Supprimer \"\(project.name)\" ?", isPresented: $showDeleteConfirm) {
             Button("Supprimer", role: .destructive) {
