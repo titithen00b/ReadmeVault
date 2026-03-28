@@ -33,3 +33,9 @@ Icon
 
 # VSCode
 .vscode/
+
+# Claude
+.claude
+CLAUDE.md
+icon.svg
+incone.png

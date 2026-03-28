@@ -43,17 +43,34 @@ jobs:
           cd build/ReadmeVault.xcarchive/Products/Applications
           zip -r ../../../../ReadmeVault.zip ReadmeVault.app
 
+      - name: Générer les notes de version
+        id: changelog
+        run: |
+          PREV_TAG=$(git tag --sort=-version:refname | grep -v "^${{ github.ref_name }}$" | head -1)
+          if [ -z "$PREV_TAG" ]; then
+            COMMITS=$(git log --pretty=format:"- %s" HEAD)
+          else
+            COMMITS=$(git log --pretty=format:"- %s" ${PREV_TAG}..HEAD)
+          fi
+          echo "commits<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMITS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Publier la release GitHub
         uses: softprops/action-gh-release@v2
         with:
           name: ReadmeVault ${{ github.ref_name }}
           body: |
-            ## ReadmeVault ${{ github.ref_name }}
+            ## Nouveautés
+
+            ${{ steps.changelog.outputs.commits }}
+
+            ---
 
             ### Installation
             1. Télécharge `ReadmeVault.zip`
             2. Décompresse et glisse `ReadmeVault.app` dans `/Applications`
-            3. Clic droit → Ouvrir (première fois, pour bypasser Gatekeeper)
+            3. Clic droit → **Ouvrir** (première fois, pour bypasser Gatekeeper)
           files: ReadmeVault.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
