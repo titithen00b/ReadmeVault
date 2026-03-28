@@ -5,6 +5,24 @@ struct SidebarView: View {
     @Binding var showAddSheet: Bool
     @Binding var showImportSheet: Bool
     @Binding var showFileImportPicker: Bool
+    @State private var selectedIDs: Set<UUID> = []
+
+    private func deleteSelected() {
+        let count = selectedIDs.count
+        guard count > 0 else { return }
+        let alert = NSAlert()
+        alert.messageText = count == 1
+            ? "Supprimer ce projet ?"
+            : "Supprimer \(count) projets ?"
+        alert.informativeText = "Cette action est irréversible."
+        alert.addButton(withTitle: "Supprimer")
+        alert.addButton(withTitle: "Annuler")
+        alert.alertStyle = .warning
+        if alert.runModal() == .alertFirstButtonReturn {
+            store.deleteMultiple(selectedIDs)
+            selectedIDs = []
+        }
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -120,17 +138,24 @@ struct SidebarView: View {
                     Spacer()
                 }
             } else {
-                ScrollView {
-                    LazyVStack(spacing: 4) {
-                        ForEach(store.filteredProjects) { project in
-                            ProjectRowView(project: project)
-                                .onTapGesture {
-                                    store.selectedProject = project
-                                }
-                        }
+                List(store.filteredProjects, id: \.id, selection: $selectedIDs) { project in
+                    ProjectRowView(project: project, selectedIDs: selectedIDs)
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                        .listRowInsets(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 8))
+                }
+                .listStyle(.plain)
+                .onChange(of: selectedIDs) { ids in
+                    if let id = ids.first,
+                       let project = store.projects.first(where: { $0.id == id }) {
+                        store.selectedProject = project
                     }
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 8)
+                }
+                .onDeleteCommand(perform: deleteSelected)
+                .onAppear {
+                    if let sel = store.selectedProject {
+                        selectedIDs = [sel.id]
+                    }
                 }
             }
 
@@ -138,14 +163,23 @@ struct SidebarView: View {
 
             // Bottom actions
             HStack(spacing: 8) {
-                Button {
-                    showImportSheet = true
-                } label: {
-                    Label("Importer GitHub", systemImage: "arrow.down.circle")
-                        .font(.system(size: 12, weight: .medium))
+                if selectedIDs.count > 1 {
+                    Button(action: deleteSelected) {
+                        Label("Supprimer (\(selectedIDs.count))", systemImage: "trash")
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.red)
+                } else {
+                    Button {
+                        showImportSheet = true
+                    } label: {
+                        Label("Importer GitHub", systemImage: "arrow.down.circle")
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(Color(hex: "#43D9AD"))
                 }
-                .buttonStyle(.bordered)
-                .tint(Color(hex: "#43D9AD"))
 
                 Spacer()
 
@@ -185,10 +219,11 @@ struct SidebarView: View {
 struct ProjectRowView: View {
     @EnvironmentObject var store: ProjectStore
     let project: Project
+    var selectedIDs: Set<UUID> = []
     @State private var isHovered = false
 
     var isSelected: Bool {
-        store.selectedProject?.id == project.id
+        selectedIDs.contains(project.id)
     }
 
     var body: some View {

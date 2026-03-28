@@ -201,6 +201,17 @@ class ProjectStore: ObservableObject {
         saveMetadata()
     }
 
+    func deleteMultiple(_ ids: Set<UUID>) {
+        for id in ids {
+            projects.removeAll { $0.id == id }
+            try? FileManager.default.removeItem(at: readmeURL(for: id))
+        }
+        if let selected = selectedProject, ids.contains(selected.id) {
+            selectedProject = projects.first
+        }
+        saveMetadata()
+    }
+
     // MARK: - Import GitHub
 
     func importFromGitHub(url: String) async throws -> Project {
