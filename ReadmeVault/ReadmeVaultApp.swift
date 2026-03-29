@@ -106,16 +106,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupStatusItem()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            if let window = NSApp.windows.first(where: { !($0 is NSPanel) }) {
-                window.isReleasedWhenClosed = false
-                self.mainWindow = window
-            }
-        }
-
         NotificationCenter.default.addObserver(forName: .openMainWindow, object: nil, queue: .main) { [weak self] notification in
             let projectID = (notification.userInfo?["projectID"] as? String).flatMap { UUID(uuidString: $0) }
             self?.showMainWindow(selectingProjectID: projectID)
+        }
+    }
+
+    func applicationDidBecomeActive(_ notification: Notification) {
+        // Capture la fenêtre principale dès que l'app est active (avant que l'user puisse la fermer)
+        if mainWindow == nil,
+           let window = NSApp.windows.first(where: { !($0 is NSPanel) && $0.contentView != nil }) {
+            window.isReleasedWhenClosed = false
+            mainWindow = window
         }
     }
 
@@ -146,10 +148,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             NSApp.activate(ignoringOtherApps: true)
             let window = self.mainWindow ?? NSApp.windows.first(where: { !($0 is NSPanel) })
             window?.isReleasedWhenClosed = false
+            window?.alphaValue = 1
             window?.makeKeyAndOrderFront(nil)
-            if let id = projectID,
-               let project = self.projectStore?.projects.first(where: { $0.id == id }) {
-                self.projectStore?.selectedProject = project
+            // Délai pour laisser SwiftUI re-rendre la fenêtre avant de changer le projet
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                if let id = projectID,
+                   let project = self.projectStore?.projects.first(where: { $0.id == id }) {
+                    self.projectStore?.selectedProject = project
+                }
             }
         }
     }
