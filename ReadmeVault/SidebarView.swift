@@ -140,9 +140,14 @@ struct SidebarView: View {
                 }
             } else {
                 ScrollView {
-                    LazyVStack(spacing: 0) {
+                    VStack(spacing: 0) {
                         ForEach(store.filteredProjects) { project in
-                            ProjectRowView(project: project, selectedIDs: selectedIDs)
+                            ProjectRowView(
+                                project: project,
+                                isSelected: selectedIDs.count > 1
+                                    ? selectedIDs.contains(project.id)
+                                    : store.selectedProject?.id == project.id
+                            )
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 2)
                                 .contentShape(Rectangle())
@@ -178,6 +183,11 @@ struct SidebarView: View {
                 .onAppear {
                     if let sel = store.selectedProject {
                         selectedIDs = [sel.id]
+                    }
+                }
+                .onChange(of: store.selectedProject) { _, newProject in
+                    if let p = newProject {
+                        selectedIDs = [p.id]
                     }
                 }
                 .onDeleteCommand(perform: deleteSelected)
@@ -243,12 +253,8 @@ struct SidebarView: View {
 struct ProjectRowView: View {
     @EnvironmentObject var store: ProjectStore
     let project: Project
-    var selectedIDs: Set<UUID> = []
+    var isSelected: Bool = false
     @State private var isHovered = false
-
-    var isSelected: Bool {
-        selectedIDs.contains(project.id)
-    }
 
     var body: some View {
         HStack(spacing: 10) {
