@@ -1,3 +1,4 @@
+#if os(macOS)
 import SwiftUI
 
 struct SidebarView: View {
@@ -402,3 +403,5 @@ struct TagChip: View {
         .buttonStyle(.plain)
     }
 }
+
+#endif

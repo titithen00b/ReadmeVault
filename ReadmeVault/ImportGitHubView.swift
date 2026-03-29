@@ -171,7 +171,7 @@ struct ImportGitHubView: View {
             .padding(16)
             .background(
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(Color(NSColor.controlBackgroundColor))
+                    .fill(Color.cardBackground)
             )
         }
     }
@@ -224,7 +224,7 @@ struct ImportGitHubView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(NSColor.controlBackgroundColor))
+                    .fill(Color.cardBackground)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
                             .strokeBorder(project.accentColor.opacity(0.3), lineWidth: 1)
@@ -253,7 +253,7 @@ struct ImportGitHubView: View {
                     .font(.system(size: 12, design: .monospaced))
                     .foregroundColor(.secondary)
                     .padding(10)
-                    .background(Color(NSColor.textBackgroundColor))
+                    .background(Color.sheetBackground)
                     .cornerRadius(8)
             }
         }

@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Combine
 
 struct Project: Identifiable, Codable, Hashable {
     var id = UUID()

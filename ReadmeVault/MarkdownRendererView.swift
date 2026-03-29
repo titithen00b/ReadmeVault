@@ -2,6 +2,9 @@ import SwiftUI
 import WebKit
 import UniformTypeIdentifiers
 
+// MARK: - Cross-platform WKWebView representable
+
+#if os(macOS)
 struct MarkdownRendererView: NSViewRepresentable {
     let content: String
     let accentColor: Color
@@ -18,8 +21,7 @@ struct MarkdownRendererView: NSViewRepresentable {
     func makeCoordinator() -> Coordinator { Coordinator() }
 
     func makeNSView(context: Context) -> WKWebView {
-        let config = WKWebViewConfiguration()
-        let webView = WKWebView(frame: .zero, configuration: config)
+        let webView = WKWebView(frame: .zero)
         webView.setValue(false, forKey: "drawsBackground")
         webView.navigationDelegate = context.coordinator
         context.coordinator.webView = webView
@@ -28,7 +30,9 @@ struct MarkdownRendererView: NSViewRepresentable {
 
     func updateNSView(_ webView: WKWebView, context: Context) {
         let hex = colorToHex(accentColor)
-        let html = generateHTML(markdown: content, accentHex: hex)
+        let isDark = NSApp.effectiveAppearance.name == .darkAqua ||
+                     NSApp.effectiveAppearance.name == .vibrantDark
+        let html = generateHTML(markdown: content, accentHex: hex, isDark: isDark)
         if context.coordinator.lastHTML != html {
             context.coordinator.lastHTML = html
             context.coordinator.isLoaded = false
@@ -41,7 +45,51 @@ struct MarkdownRendererView: NSViewRepresentable {
             context.coordinator.triggerExport()
         }
     }
+}
 
+#else
+struct MarkdownRendererView: UIViewRepresentable {
+    let content: String
+    let accentColor: Color
+    var filename: String = "README"
+    @Binding var exportTrigger: Bool
+
+    init(content: String, accentColor: Color, filename: String = "README", exportTrigger: Binding<Bool> = .constant(false)) {
+        self.content = content
+        self.accentColor = accentColor
+        self.filename = filename
+        self._exportTrigger = exportTrigger
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator() }
+
+    func makeUIView(context: Context) -> WKWebView {
+        let webView = WKWebView(frame: .zero)
+        webView.isOpaque = false
+        webView.backgroundColor = .clear
+        webView.scrollView.backgroundColor = .clear
+        webView.navigationDelegate = context.coordinator
+        context.coordinator.webView = webView
+        return webView
+    }
+
+    func updateUIView(_ webView: WKWebView, context: Context) {
+        let hex = colorToHex(accentColor)
+        let isDark = UITraitCollection.current.userInterfaceStyle == .dark
+        let html = generateHTML(markdown: content, accentHex: hex, isDark: isDark)
+        if context.coordinator.lastHTML != html {
+            context.coordinator.lastHTML = html
+            context.coordinator.isLoaded = false
+            webView.alpha = 0
+            webView.loadHTMLString(html, baseURL: URL(string: "https://github.com/"))
+        }
+    }
+}
+#endif
+
+// MARK: - Shared Coordinator
+
+extension MarkdownRendererView {
     class Coordinator: NSObject, WKNavigationDelegate {
         weak var webView: WKWebView?
         var lastHTML = ""
@@ -52,18 +100,27 @@ struct MarkdownRendererView: NSViewRepresentable {
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isLoaded = true
             DispatchQueue.main.async {
+                #if os(macOS)
                 NSAnimationContext.runAnimationGroup { ctx in
                     ctx.duration = 0.18
                     ctx.timingFunction = CAMediaTimingFunction(name: .easeIn)
                     webView.animator().alphaValue = 1
                 }
+                #else
+                UIView.animate(withDuration: 0.18) {
+                    webView.alpha = 1
+                }
+                #endif
             }
             if pendingExport {
                 pendingExport = false
+                #if os(macOS)
                 exportPDF(webView)
+                #endif
             }
         }
 
+        #if os(macOS)
         func triggerExport() {
             guard let webView = webView else { return }
             if isLoaded { exportPDF(webView) } else { pendingExport = true }
@@ -85,24 +142,35 @@ struct MarkdownRendererView: NSViewRepresentable {
                 op.run()
             }
         }
+        #endif
     }
+}
 
-    private func colorToHex(_ color: Color) -> String {
+// MARK: - Shared HTML generation
+
+extension MarkdownRendererView {
+    func colorToHex(_ color: Color) -> String {
+        #if os(macOS)
         guard let cgColor = NSColor(color).cgColor.converted(
             to: CGColorSpace(name: CGColorSpace.sRGB)!,
             intent: .defaultIntent,
             options: nil
         ) else { return "#6C63FF" }
+        #else
+        guard let cgColor = UIColor(color).cgColor.converted(
+            to: CGColorSpace(name: CGColorSpace.sRGB)!,
+            intent: .defaultIntent,
+            options: nil
+        ) else { return "#6C63FF" }
+        #endif
         let r = Int((cgColor.components?[0] ?? 0) * 255)
         let g = Int((cgColor.components?[1] ?? 0) * 255)
         let b = Int((cgColor.components?[2] ?? 0) * 255)
         return String(format: "#%02X%02X%02X", r, g, b)
     }
 
-    private func generateHTML(markdown: String, accentHex: String) -> String {
+    func generateHTML(markdown: String, accentHex: String, isDark: Bool) -> String {
         let rendered = parseMarkdown(markdown)
-        let isDark = NSApp.effectiveAppearance.name == .darkAqua ||
-                     NSApp.effectiveAppearance.name == .vibrantDark
 
         let bgColor = isDark ? "#1e1e2e" : "#ffffff"
         let textColor = isDark ? "#cdd6f4" : "#2d2d2d"
@@ -118,6 +186,7 @@ struct MarkdownRendererView: NSViewRepresentable {
         <html>
         <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
           * { box-sizing: border-box; margin: 0; padding: 0; }
           body {
@@ -239,17 +308,6 @@ struct MarkdownRendererView: NSViewRepresentable {
           img { max-width: 100%; border-radius: 8px; }
           strong { font-weight: 700; color: \(isDark ? "#cdd6f4" : "#1a1a2e"); }
           em { font-style: italic; color: \(subTextColor); }
-          .badge {
-            display: inline-block;
-            background: \(accentHex)20;
-            color: \(accentHex);
-            border: 1px solid \(accentHex)40;
-            border-radius: 4px;
-            padding: 1px 6px;
-            font-size: 11px;
-            font-weight: 600;
-            margin: 1px;
-          }
         </style>
         </head>
         <body>
@@ -259,8 +317,7 @@ struct MarkdownRendererView: NSViewRepresentable {
         """
     }
 
-    // Simple markdown parser
-    private func parseMarkdown(_ text: String) -> String {
+    func parseMarkdown(_ text: String) -> String {
         var lines = text.components(separatedBy: "\n")
         var html = ""
         var inCodeBlock = false
@@ -272,7 +329,6 @@ struct MarkdownRendererView: NSViewRepresentable {
         while i < lines.count {
             let line = lines[i]
 
-            // Code blocks
             if line.hasPrefix("```") {
                 if inCodeBlock {
                     html += "</code></pre>\n"
@@ -292,7 +348,6 @@ struct MarkdownRendererView: NSViewRepresentable {
                 continue
             }
 
-            // Close list if needed
             if !line.hasPrefix("- ") && !line.hasPrefix("* ") && !line.match(pattern: "^\\d+\\. ") {
                 if inList {
                     html += "</\(listType)>\n"
@@ -300,7 +355,6 @@ struct MarkdownRendererView: NSViewRepresentable {
                 }
             }
 
-            // Headings
             if line.hasPrefix("######") {
                 html += "<h6>\(inlineMarkdown(String(line.dropFirst(6)).trimmingCharacters(in: .whitespaces)))</h6>\n"
             } else if line.hasPrefix("#####") {
@@ -313,26 +367,18 @@ struct MarkdownRendererView: NSViewRepresentable {
                 html += "<h2>\(inlineMarkdown(String(line.dropFirst(2)).trimmingCharacters(in: .whitespaces)))</h2>\n"
             } else if line.hasPrefix("#") {
                 html += "<h1>\(inlineMarkdown(String(line.dropFirst(1)).trimmingCharacters(in: .whitespaces)))</h1>\n"
-            }
-            // Blockquote
-            else if line.hasPrefix("> ") {
+            } else if line.hasPrefix("> ") {
                 html += "<blockquote>\(inlineMarkdown(String(line.dropFirst(2))))</blockquote>\n"
-            }
-            // HR
-            else if line == "---" || line == "***" || line == "___" {
+            } else if line == "---" || line == "***" || line == "___" {
                 html += "<hr>\n"
-            }
-            // Unordered list
-            else if line.hasPrefix("- ") || line.hasPrefix("* ") {
+            } else if line.hasPrefix("- ") || line.hasPrefix("* ") {
                 if !inList {
                     html += "<ul>\n"
                     inList = true
                     listType = "ul"
                 }
                 html += "<li>\(inlineMarkdown(String(line.dropFirst(2))))</li>\n"
-            }
-            // Ordered list
-            else if line.match(pattern: "^\\d+\\. ") {
+            } else if line.match(pattern: "^\\d+\\. ") {
                 if !inList {
                     html += "<ol>\n"
                     inList = true
@@ -340,33 +386,27 @@ struct MarkdownRendererView: NSViewRepresentable {
                 }
                 let content = line.replacingOccurrences(of: "^\\d+\\. ", with: "", options: .regularExpression)
                 html += "<li>\(inlineMarkdown(content))</li>\n"
-            }
-            // Table
-            else if line.contains("|") {
+            } else if line.contains("|") {
                 let cells = line.split(separator: "|").map { String($0).trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
                 if !inTable {
                     html += "<table>\n<thead><tr>"
                     for cell in cells { html += "<th>\(inlineMarkdown(cell))</th>" }
                     html += "</tr></thead>\n<tbody>\n"
                     inTable = true
-                    i += 2 // skip separator line
+                    i += 2
                     continue
                 } else {
                     html += "<tr>"
                     for cell in cells { html += "<td>\(inlineMarkdown(cell))</td>" }
                     html += "</tr>\n"
                 }
-            }
-            // Empty line
-            else if line.trimmingCharacters(in: .whitespaces).isEmpty {
+            } else if line.trimmingCharacters(in: .whitespaces).isEmpty {
                 if inTable {
                     html += "</tbody></table>\n"
                     inTable = false
                 }
                 html += "\n"
-            }
-            // Paragraph
-            else {
+            } else {
                 html += "<p>\(inlineMarkdown(line))</p>\n"
             }
             i += 1
@@ -378,34 +418,26 @@ struct MarkdownRendererView: NSViewRepresentable {
         return html
     }
 
-    private func inlineMarkdown(_ text: String) -> String {
+    func inlineMarkdown(_ text: String) -> String {
         var result = escapeHTML(text)
-        // Bold + italic
         result = result.replacingOccurrences(of: "\\*\\*\\*(.*?)\\*\\*\\*", with: "<strong><em>$1</em></strong>", options: .regularExpression)
-        // Bold
         result = result.replacingOccurrences(of: "\\*\\*(.*?)\\*\\*", with: "<strong>$1</strong>", options: .regularExpression)
         result = result.replacingOccurrences(of: "__(.*?)__", with: "<strong>$1</strong>", options: .regularExpression)
-        // Italic
         result = result.replacingOccurrences(of: "\\*(.*?)\\*", with: "<em>$1</em>", options: .regularExpression)
         result = result.replacingOccurrences(of: "_(.*?)_", with: "<em>$1</em>", options: .regularExpression)
-        // Code
         result = result.replacingOccurrences(of: "`(.*?)`", with: "<code>$1</code>", options: .regularExpression)
-        // Strikethrough
         result = result.replacingOccurrences(of: "~~(.*?)~~", with: "<del>$1</del>", options: .regularExpression)
-        // Linked images — badges: [![alt](img_url)](link_url)
         result = result.replacingOccurrences(
             of: "\\[!\\[([^\\]]*)\\]\\(([^)]+)\\)\\]\\(([^)]+)\\)",
             with: "<a href=\"$3\"><img src=\"$2\" alt=\"$1\" style=\"display:inline;vertical-align:middle;max-height:22px;border-radius:4px;\"></a>",
             options: .regularExpression
         )
-        // Images
         result = result.replacingOccurrences(of: "!\\[([^\\]]*)\\]\\(([^)]+)\\)", with: "<img src=\"$2\" alt=\"$1\" style=\"max-height:22px;vertical-align:middle;border-radius:4px;\">", options: .regularExpression)
-        // Links
         result = result.replacingOccurrences(of: "\\[([^\\]]+)\\]\\(([^)]+)\\)", with: "<a href=\"$2\">$1</a>", options: .regularExpression)
         return result
     }
 
-    private func escapeHTML(_ text: String) -> String {
+    func escapeHTML(_ text: String) -> String {
         text
             .replacingOccurrences(of: "&", with: "&amp;")
             .replacingOccurrences(of: "<", with: "&lt;")

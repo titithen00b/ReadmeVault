@@ -1,5 +1,24 @@
 import SwiftUI
 
+// MARK: - iOS App
+
+#if os(iOS)
+@main
+struct ReadmeVaultApp: App {
+    @StateObject private var store = ProjectStore()
+
+    var body: some Scene {
+        WindowGroup {
+            ContentViewIOS()
+                .environmentObject(store)
+        }
+    }
+}
+#endif
+
+// MARK: - macOS App
+
+#if os(macOS)
 @main
 struct ReadmeVaultApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -113,7 +132,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
-        // Capture la fenêtre principale dès que l'app est active (avant que l'user puisse la fermer)
         if mainWindow == nil,
            let window = NSApp.windows.first(where: { !($0 is NSPanel) && $0.contentView != nil }) {
             window.isReleasedWhenClosed = false
@@ -150,7 +168,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             window?.isReleasedWhenClosed = false
             window?.alphaValue = 1
             window?.makeKeyAndOrderFront(nil)
-            // Délai pour laisser SwiftUI re-rendre la fenêtre avant de changer le projet
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 if let id = projectID,
                    let project = self.projectStore?.projects.first(where: { $0.id == id }) {
@@ -199,3 +216,4 @@ extension Notification.Name {
     static let focusSearch    = Notification.Name("focusSearch")
     static let openMainWindow = Notification.Name("openMainWindow")
 }
+#endif

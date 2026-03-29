@@ -1,3 +1,4 @@
+#if os(macOS)
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -119,3 +120,4 @@ struct EmptyStateView: View {
         .background(Color(NSColor.windowBackgroundColor))
     }
 }
+#endif

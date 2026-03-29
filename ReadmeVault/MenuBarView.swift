@@ -1,3 +1,4 @@
+#if os(macOS)
 import SwiftUI
 
 struct MenuBarView: View {
@@ -190,3 +191,5 @@ private struct MenuBarProjectRow: View {
         .onHover { isHovered = $0 }
     }
 }
+
+#endif

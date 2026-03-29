@@ -228,7 +228,7 @@ struct ProjectFormView: View {
                 .padding(12)
                 .background(
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(Color(NSColor.controlBackgroundColor))
+                        .fill(Color.cardBackground)
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)
                                 .strokeBorder((Color(hex: selectedColor) ?? .purple).opacity(0.3), lineWidth: 1)
@@ -260,7 +260,7 @@ struct ProjectFormView: View {
                 .font(.system(size: 13, design: .monospaced))
                 .frame(minHeight: 320)
                 .padding(8)
-                .background(Color(NSColor.textBackgroundColor))
+                .background(Color.sheetBackground)
                 .cornerRadius(8)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)

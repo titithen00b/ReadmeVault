@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -15,10 +15,16 @@
 		A006 /* MarkdownRendererView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B006 /* MarkdownRendererView.swift */; };
 		A007 /* ProjectFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B007 /* ProjectFormView.swift */; };
 		A008 /* ImportGitHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B008 /* ImportGitHubView.swift */; };
+		A009 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B009 /* Assets.xcassets */; };
 		A010 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B010 /* AboutView.swift */; };
 		A011 /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B011 /* HelpView.swift */; };
 		A012 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B012 /* MenuBarView.swift */; };
-		A009 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B009 /* Assets.xcassets */; };
+		A013 /* SharedViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B013 /* SharedViews.swift */; };
+		BC7DFF0B2F79988900D65539 /* ProjectStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B003 /* ProjectStore.swift */; };
+		BC7DFF0C2F7998CD00D65539 /* MarkdownRendererView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B006 /* MarkdownRendererView.swift */; };
+		BC7DFF0D2F7998CD00D65539 /* ImportGitHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B008 /* ImportGitHubView.swift */; };
+		BC7DFF0E2F7998CD00D65539 /* ProjectFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B007 /* ProjectFormView.swift */; };
+		BC7DFF0F2F7998CD00D65539 /* ProjectDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B005 /* ProjectDetailView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,14 +36,39 @@
 		B006 /* MarkdownRendererView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownRendererView.swift; sourceTree = "<group>"; };
 		B007 /* ProjectFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectFormView.swift; sourceTree = "<group>"; };
 		B008 /* ImportGitHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportGitHubView.swift; sourceTree = "<group>"; };
+		B009 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B010 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		B011 /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
 		B012 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
-		B009 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B013 /* SharedViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedViews.swift; sourceTree = "<group>"; };
+		BC3AFBEC2F79930E00206453 /* ReadMeVault.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReadMeVault.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		PROD /* ReadmeVault.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReadmeVault.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		BC7DFF132F7998CE00D65539 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				ContentViewIOS.swift,
+				ProjectDetailView.swift,
+				ProjectDetailViewIOS.swift,
+			);
+			target = E001 /* ReadmeVault */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		BC3AFBED2F79930E00206453 /* ReadmeVault */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (BC7DFF132F7998CE00D65539 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ReadmeVault; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
+		BC3AFBE92F79930E00206453 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C001 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -52,6 +83,7 @@
 			isa = PBXGroup;
 			children = (
 				D001 /* ReadmeVault */,
+				BC3AFBED2F79930E00206453 /* ReadmeVault */,
 				D002 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -70,6 +102,7 @@
 				B010 /* AboutView.swift */,
 				B011 /* HelpView.swift */,
 				B012 /* MenuBarView.swift */,
+				B013 /* SharedViews.swift */,
 				B009 /* Assets.xcassets */,
 			);
 			path = ReadmeVault;
@@ -79,6 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				PROD /* ReadmeVault.app */,
+				BC3AFBEC2F79930E00206453 /* ReadMeVault.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -86,6 +120,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		BC3AFBEB2F79930E00206453 /* ReadMeVault */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BC3AFBF62F79930F00206453 /* Build configuration list for PBXNativeTarget "ReadMeVault" */;
+			buildPhases = (
+				BC3AFBE82F79930E00206453 /* Sources */,
+				BC3AFBE92F79930E00206453 /* Frameworks */,
+				BC3AFBEA2F79930E00206453 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				BC3AFBED2F79930E00206453 /* ReadmeVault */,
+			);
+			name = ReadMeVault;
+			packageProductDependencies = (
+			);
+			productName = ReadMeVault;
+			productReference = BC3AFBEC2F79930E00206453 /* ReadMeVault.app */;
+			productType = "com.apple.product-type.application";
+		};
 		E001 /* ReadmeVault */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F001 /* Build configuration list for PBXNativeTarget "ReadmeVault" */;
@@ -110,9 +166,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1500;
+				LastSwiftUpdateCheck = 2640;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
+					BC3AFBEB2F79930E00206453 = {
+						CreatedOnToolsVersion = 26.4;
+					};
 					E001 = {
 						CreatedOnToolsVersion = 15.0;
 					};
@@ -133,11 +192,19 @@
 			projectRoot = "";
 			targets = (
 				E001 /* ReadmeVault */,
+				BC3AFBEB2F79930E00206453 /* ReadMeVault */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		BC3AFBEA2F79930E00206453 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E003 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -149,6 +216,18 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		BC3AFBE82F79930E00206453 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC7DFF0C2F7998CD00D65539 /* MarkdownRendererView.swift in Sources */,
+				BC7DFF0D2F7998CD00D65539 /* ImportGitHubView.swift in Sources */,
+				BC7DFF0E2F7998CD00D65539 /* ProjectFormView.swift in Sources */,
+				BC7DFF0F2F7998CD00D65539 /* ProjectDetailView.swift in Sources */,
+				BC7DFF0B2F79988900D65539 /* ProjectStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E002 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -164,12 +243,84 @@
 				A010 /* AboutView.swift in Sources */,
 				A011 /* HelpView.swift in Sources */,
 				A012 /* MenuBarView.swift in Sources */,
+				A013 /* SharedViews.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		BC3AFBF42F79930F00206453 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = MU357D4AD3;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.titithen00b.ReadMeVault;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BC3AFBF52F79930F00206453 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = MU357D4AD3;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.titithen00b.ReadMeVault;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		G001 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -305,12 +456,12 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.readmevault.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
 			};
 			name = Debug;
 		};
@@ -333,18 +484,27 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.readmevault.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		BC3AFBF62F79930F00206453 /* Build configuration list for PBXNativeTarget "ReadMeVault" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BC3AFBF42F79930F00206453 /* Debug */,
+				BC3AFBF52F79930F00206453 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		F000 /* Build configuration list for PBXProject "ReadmeVault" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -364,7 +524,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
 	};
 	rootObject = PROJ /* Project object */;
 }

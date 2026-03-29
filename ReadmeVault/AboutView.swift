@@ -1,3 +1,4 @@
+#if os(macOS)
 import SwiftUI
 import AppKit
 
@@ -121,3 +122,5 @@ private struct AboutInfoRow: View {
         .padding(.vertical, 10)
     }
 }
+
+#endif
