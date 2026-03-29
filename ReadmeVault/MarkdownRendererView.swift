@@ -32,6 +32,7 @@ struct MarkdownRendererView: NSViewRepresentable {
         if context.coordinator.lastHTML != html {
             context.coordinator.lastHTML = html
             context.coordinator.isLoaded = false
+            webView.alphaValue = 0
             webView.loadHTMLString(html, baseURL: URL(string: "https://github.com/"))
         }
         context.coordinator.filename = filename
@@ -50,6 +51,13 @@ struct MarkdownRendererView: NSViewRepresentable {
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isLoaded = true
+            DispatchQueue.main.async {
+                NSAnimationContext.runAnimationGroup { ctx in
+                    ctx.duration = 0.18
+                    ctx.timingFunction = CAMediaTimingFunction(name: .easeIn)
+                    webView.animator().alphaValue = 1
+                }
+            }
             if pendingExport {
                 pendingExport = false
                 exportPDF(webView)

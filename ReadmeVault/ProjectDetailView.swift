@@ -238,6 +238,7 @@ struct ProjectDetailView: View {
                     EmptyView()
                 }
             }
+            .background(Color(NSColor.windowBackgroundColor))
         }
         .sheet(isPresented: $showEditSheet) {
             ProjectFormView(mode: .edit(project))

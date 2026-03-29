@@ -139,36 +139,48 @@ struct SidebarView: View {
                     Spacer()
                 }
             } else {
-                List(store.filteredProjects, id: \.id, selection: $selectedIDs) { project in
-                    ProjectRowView(project: project, selectedIDs: selectedIDs)
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-                        .listRowInsets(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 8))
-                        .ifManualSort(store.sortOrder == .manual) {
-                            $0.onDrag {
-                                draggingID = project.id
-                                return NSItemProvider(object: project.id.uuidString as NSString)
-                            }
-                            .onDrop(of: [.plainText], delegate: ProjectDropDelegate(
-                                targetID: project.id,
-                                draggingID: $draggingID,
-                                store: store
-                            ))
+                ScrollView {
+                    LazyVStack(spacing: 0) {
+                        ForEach(store.filteredProjects) { project in
+                            ProjectRowView(project: project, selectedIDs: selectedIDs)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 2)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    let isCmd = NSEvent.modifierFlags.contains(.command)
+                                    if isCmd {
+                                        if selectedIDs.contains(project.id) {
+                                            selectedIDs.remove(project.id)
+                                        } else {
+                                            selectedIDs.insert(project.id)
+                                            store.selectedProject = project
+                                        }
+                                    } else {
+                                        selectedIDs = [project.id]
+                                        store.selectedProject = project
+                                    }
+                                }
+                                .ifManualSort(store.sortOrder == .manual) {
+                                    $0.onDrag {
+                                        draggingID = project.id
+                                        return NSItemProvider(object: project.id.uuidString as NSString)
+                                    }
+                                    .onDrop(of: [.plainText], delegate: ProjectDropDelegate(
+                                        targetID: project.id,
+                                        draggingID: $draggingID,
+                                        store: store
+                                    ))
+                                }
                         }
-                }
-                .listStyle(.plain)
-                .onChange(of: selectedIDs) { _, ids in
-                    if let id = ids.first,
-                       let project = store.projects.first(where: { $0.id == id }) {
-                        store.selectedProject = project
                     }
+                    .padding(.vertical, 4)
                 }
-                .onDeleteCommand(perform: deleteSelected)
                 .onAppear {
                     if let sel = store.selectedProject {
                         selectedIDs = [sel.id]
                     }
                 }
+                .onDeleteCommand(perform: deleteSelected)
             }
 
             Divider()

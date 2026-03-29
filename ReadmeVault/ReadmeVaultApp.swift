@@ -129,6 +129,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             button.image = NSImage(systemSymbolName: "doc.text.magnifyingglass", accessibilityDescription: "ReadmeVault")
             button.action = #selector(togglePopover(_:))
             button.target = self
+            button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
         let pop = NSPopover()
         pop.contentSize = CGSize(width: 280, height: 420)
@@ -154,6 +155,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func togglePopover(_ sender: NSStatusBarButton) {
+        guard let event = NSApp.currentEvent else { return }
+        if event.type == .rightMouseUp {
+            let menu = NSMenu()
+            menu.addItem(withTitle: "Ouvrir ReadmeVault", action: #selector(openMainWindowFromMenu), keyEquivalent: "")
+            menu.addItem(.separator())
+            menu.addItem(withTitle: "Quitter ReadmeVault", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+            menu.items.forEach { $0.target = $0.action == #selector(openMainWindowFromMenu) ? self : NSApp }
+            statusItem?.menu = menu
+            sender.performClick(nil)
+            statusItem?.menu = nil
+            return
+        }
         guard let popover else { return }
         if popover.contentViewController == nil, let store = projectStore {
             applyStoreToPopover(store)
@@ -164,6 +177,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             popover.show(relativeTo: sender.bounds, of: sender, preferredEdge: .minY)
             popover.contentViewController?.view.window?.makeKey()
         }
+    }
+
+    @objc private func openMainWindowFromMenu() {
+        showMainWindow()
     }
 }
 
