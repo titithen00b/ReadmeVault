@@ -185,11 +185,6 @@ struct SidebarView: View {
                         selectedIDs = [sel.id]
                     }
                 }
-                .onChange(of: store.selectedProject) { _, newProject in
-                    if let p = newProject {
-                        selectedIDs = [p.id]
-                    }
-                }
                 .onDeleteCommand(perform: deleteSelected)
             }
 
