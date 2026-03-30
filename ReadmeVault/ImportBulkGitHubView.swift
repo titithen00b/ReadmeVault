@@ -192,15 +192,12 @@ struct ImportBulkGitHubView: View {
                     .foregroundColor(.secondary)
                 Spacer()
                 Button(selectedIDs.count == repos.count ? "Tout désélectionner" : "Tout sélectionner") {
-                    if selectedIDs.count == repos.count {
-                        selectedIDs = []
-                    } else {
-                        selectedIDs = Set(repos.map { $0.id })
-                    }
+                    toggleSelectAll()
                 }
                 .font(.system(size: 12))
                 .buttonStyle(.plain)
                 .foregroundColor(Color(hex: "#6C63FF"))
+                .keyboardShortcut("a", modifiers: .command)
             }
 
             TextField("Filtrer...", text: $filterText)
@@ -261,6 +258,14 @@ struct ImportBulkGitHubView: View {
     }
 
     // MARK: - Actions
+
+    func toggleSelectAll() {
+        if selectedIDs.count == repos.count {
+            selectedIDs = []
+        } else {
+            selectedIDs = Set(repos.map { $0.id })
+        }
+    }
 
     @MainActor
     func fetchRepos() async {
