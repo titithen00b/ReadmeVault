@@ -1,9 +1,9 @@
 # 🗄️ ReadmeVault
 
-> Centralisez tous vos READMEs de projets en un seul endroit — natif macOS, rapide, élégant.
+> Centralisez tous vos READMEs de projets en un seul endroit — natif macOS & iOS, rapide, élégant.
 
-![SwiftUI](https://img.shields.io/badge/SwiftUI-macOS%2014%2B-blue?style=for-the-badge&logo=swift)
-![Xcode](https://img.shields.io/badge/Xcode-15%2B-blue?style=for-the-badge&logo=xcode)
+![SwiftUI](https://img.shields.io/badge/SwiftUI-macOS%2014%2B%20%7C%20iOS%2017%2B-blue?style=for-the-badge&logo=swift)
+![Xcode](https://img.shields.io/badge/Xcode-16%2B-blue?style=for-the-badge&logo=xcode)
 ![Licence](https://img.shields.io/badge/Licence-MIT-green?style=for-the-badge)
 ![Langue](https://img.shields.io/badge/Langue-Français-blueviolet?style=for-the-badge)
 ![Build](https://img.shields.io/github/actions/workflow/status/Titithen00b/ReadmeVault/build.yml?style=for-the-badge&label=Build)
@@ -12,7 +12,7 @@
 
 ## Présentation
 
-**ReadmeVault** est une application macOS native construite avec **SwiftUI** qui permet de centraliser, organiser et consulter les fichiers README de tous vos projets. Plus besoin d'ouvrir GitHub ou de fouiller dans vos dossiers — tous vos READMEs sont accessibles en un clic, avec rendu Markdown complet.
+**ReadmeVault** est une application **macOS & iOS** native construite avec **SwiftUI** qui permet de centraliser, organiser et consulter les fichiers README de tous vos projets. Plus besoin d'ouvrir GitHub ou de fouiller dans vos dossiers — tous vos READMEs sont accessibles en un clic, avec rendu Markdown complet.
 
 ---
 
@@ -20,12 +20,19 @@
 
 ### Import
 - **Import GitHub** — Colle une URL de dépôt GitHub, l'app récupère automatiquement le README, la description, les topics et le nom via l'API REST GitHub
+- **Import en masse** — Connecte ton compte GitHub via un Personal Access Token et importe tous tes repos (publics **et privés**) en une seule opération, avec sélection individuelle (`⌘A` pour tout sélectionner)
 - **Import fichier local** — Ouvre un fichier `.md` depuis le Finder (`⌘O`), le titre, la description et les tags sont détectés automatiquement
 - **Saisie manuelle** — Crée un projet et colle ton Markdown directement dans l'éditeur
 
+### Mise à jour
+- **Rafraîchir depuis GitHub** — Bouton ↺ dans la vue détail pour re-fetch le README, la description et les topics depuis GitHub
+- Support des **repos privés** via token stocké — saisi une fois, réutilisé automatiquement
+- Si aucun topic GitHub n'est défini, les **tags sont auto-détectés** depuis le contenu du README (Swift, React, Docker, etc.)
+
 ### Export & Partage
-- **Export PDF** — Exporte le README rendu en PDF via la boîte de dialogue impression
-- **Share sheet** — Partage le contenu Markdown via les services macOS (Mail, Messages, AirDrop…)
+- **Export PDF** — Exporte le README rendu en PDF
+- **Share sheet** — Partage le Markdown via les services système (Mail, Messages, AirDrop…)
+- **Copier le README** — Copie le Markdown brut en un clic
 
 ### Rendu Markdown
 - Rendu HTML via **WKWebView** avec parser Markdown maison
@@ -36,57 +43,41 @@
 ### Organisation
 - **Tags** — ajout libre, filtre par tag en sidebar
 - **Couleur par projet** — palette de 12 couleurs
-- **Recherche plein texte** — filtre en temps réel sur nom, description, tags et contenu README (`⌘F`)
+- **Recherche plein texte** — filtre en temps réel sur nom, description, tags et contenu README
 - **Tri** — par nom, date de modification ou taille du README
-- **Épingler** — projets épinglés toujours en tête de liste (clic droit → Épingler)
-- **Multi-sélection** — `⌘+clic` / `⇧+clic` pour sélectionner plusieurs projets, `⌫` pour suppression groupée
-- **Dupliquer** — clic droit → Dupliquer (`⌘D`) pour cloner un projet
-- **Date relative** — "il y a 2j" affiché sous chaque projet dans la sidebar
-- **Glisser-déposer** — réordonne les projets manuellement (mode tri "Manuel")
+- **Épingler** — projets épinglés toujours en tête de liste
+- **Multi-sélection** — `⌘+clic` pour sélectionner plusieurs projets, `⌫` pour suppression groupée
+- **Dupliquer** — clone un projet (`⌘D`)
+- **Glisser-déposer** — réordonne les projets manuellement
 - **3 onglets** par projet : README rendu / Markdown brut / Informations
 - **Compteur** — nombre de mots, caractères et lignes dans l'onglet Infos
 
 ### Stockage
 - Données stockées dans `~/Library/Application Support/ReadmeVault/`
-- `projects.json` pour les métadonnées (léger, chargement rapide)
+- `projects.json` pour les métadonnées
 - `readmes/<uuid>.md` pour chaque README (pas de limite de taille)
-- Migration automatique depuis l'ancien stockage UserDefaults au premier lancement
-- Architecture prête pour iCloud (un changement d'URL suffit)
-
-### Interface
-- Interface native macOS avec `NavigationSplitView`
-- Menus système entièrement en français
-- Fenêtre **À propos** personnalisée
-- Raccourcis clavier complets
-- Icône custom pour macOS, iPhone et iPad
 
 ---
 
-## Captures d'écran
+## Plateformes
 
-> *(à venir)*
-
----
-
-## Prérequis
-
-| Élément | Version minimale |
-|---------|-----------------|
-| macOS | 14.0 (Sonoma) |
-| Xcode | 15.0 |
-| Swift | 5.9 |
+| Plateforme | Version minimale | Statut |
+|------------|-----------------|--------|
+| macOS | 14.0 (Sonoma) | ✅ Stable |
+| iPhone | iOS 17.0 | ✅ Stable |
+| iPad | iOS 17.0 | ✅ Stable |
 
 ---
 
 ## Installation
 
-### Option 1 — Télécharger la dernière release
+### macOS — Télécharger la dernière release
 
 Rends-toi sur la page [Releases](https://github.com/Titithen00b/ReadmeVault/releases), télécharge `ReadmeVault.zip`, décompresse et glisse `ReadmeVault.app` dans `/Applications`.
 
 > Première ouverture : clic droit → **Ouvrir** pour bypasser Gatekeeper.
 
-### Option 2 — Build depuis les sources
+### macOS — Build depuis les sources
 
 ```bash
 git clone https://github.com/Titithen00b/ReadmeVault.git
@@ -105,22 +96,11 @@ make install   # Copie dans /Applications
 make uninstall # Supprime l'app + toutes les données
 ```
 
-> **Note** — À la première ouverture dans Xcode, va dans le target `ReadmeVault` → *Signing & Capabilities* → sélectionne ton compte Apple (gratuit suffit).
+### iOS — Via Xcode
 
----
-
-## CI / CD
-
-| Workflow | Déclencheur | Action |
-|----------|-------------|--------|
-| `build.yml` | Push / PR sur `master` | Vérifie que le projet compile |
-| `release.yml` | Push d'un tag `v*` | Archive + publie le `.app` sur GitHub Releases |
-
-Pour créer une nouvelle release :
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
+1. Clone le repo, ouvre `ReadmeVault.xcodeproj`
+2. Sélectionne le scheme `ReadMeVault`
+3. Branche ton iPhone et appuie sur `⌘R`
 
 ---
 
@@ -128,15 +108,22 @@ git push origin v1.0.0
 
 ```
 ReadmeVault/
-├── ReadmeVaultApp.swift       # Point d'entrée @main, menus, notifications
-├── ProjectStore.swift         # Modèle Project + Store ObservableObject + API GitHub
-├── ContentView.swift          # NavigationSplitView principal + gestion des sheets
-├── SidebarView.swift          # Liste projets, recherche, filtres tags
-├── ProjectDetailView.swift    # 3 onglets : README / Brut / Infos
-├── MarkdownRendererView.swift # WKWebView + parser Markdown maison
-├── ProjectFormView.swift      # Sheet création/édition/import avec auto-détection
-├── ImportGitHubView.swift     # Import GitHub en 3 étapes
-└── AboutView.swift            # Fenêtre À propos custom
+├── ReadmeVaultApp.swift         # Point d'entrée @main, menus, status bar (macOS)
+├── ProjectStore.swift           # Modèle Project + Store + API GitHub (partagé)
+├── SharedViews.swift            # Composants partagés macOS/iOS
+├── ContentView.swift            # NavigationSplitView macOS
+├── ContentViewIOS.swift         # NavigationSplitView iOS
+├── SidebarView.swift            # Sidebar macOS
+├── ProjectListViewIOS.swift     # Liste projets iOS
+├── ProjectDetailView.swift      # Vue détail macOS
+├── ProjectDetailViewIOS.swift   # Vue détail iOS
+├── MarkdownRendererView.swift   # WKWebView cross-platform
+├── ProjectFormView.swift        # Sheet création/édition (partagé)
+├── ImportGitHubView.swift       # Import GitHub unitaire (partagé)
+├── ImportBulkGitHubView.swift   # Import en masse avec token (partagé)
+├── MenuBarView.swift            # Status bar macOS
+├── AboutView.swift              # Fenêtre À propos (macOS)
+└── HelpView.swift               # Aide (macOS)
 ```
 
 ---
@@ -150,27 +137,17 @@ struct Project: Identifiable, Codable, Hashable {
     var description: String   // Premier paragraphe du README
     var readme: String        // Contenu Markdown complet
     var gitURL: String        // URL du dépôt
-    var tags: [String]        // Tags (auto-détectés ou manuels)
+    var tags: [String]        // Tags (GitHub topics ou auto-détectés)
     var color: String         // Couleur hex ex: "#6C63FF"
     var createdAt: Date
     var updatedAt: Date
-    var isPinned: Bool        // Épinglé en tête de liste
+    var isPinned: Bool
 }
-```
-
-### Stockage sur disque
-
-```
-~/Library/Application Support/ReadmeVault/
-├── projects.json          ← métadonnées de tous les projets (sans le contenu README)
-└── readmes/
-    ├── <uuid>.md          ← README de chaque projet
-    └── <uuid>.md
 ```
 
 ---
 
-## Raccourcis clavier
+## Raccourcis clavier (macOS)
 
 | Raccourci | Action |
 |-----------|--------|
@@ -179,45 +156,34 @@ struct Project: Identifiable, Codable, Hashable {
 | `⌘I` | Importer depuis GitHub |
 | `⌘D` | Dupliquer le projet sélectionné |
 | `⌘F` | Rechercher |
+| `⌘A` | Tout sélectionner (import en masse) |
 | `⌘↩` | Enregistrer (dans le formulaire) |
 | `⌫` | Supprimer le(s) projet(s) sélectionné(s) |
 | `⎋` | Annuler / Fermer |
 
 ---
 
-## Palette de couleurs
+## CI / CD
 
-| Couleur | Hex | Usage |
-|---------|-----|-------|
-| Violet | `#6C63FF` | Accent principal |
-| Rose | `#FF6584` | Projets |
-| Vert menthe | `#43D9AD` | Import GitHub |
-| Jaune | `#F7B731` | Projets |
-| Turquoise | `#4ECDC4` | Projets |
-| Corail | `#FF6B6B` | Projets |
+| Workflow | Déclencheur | Action |
+|----------|-------------|--------|
+| `build.yml` | Push / PR sur `master` | Vérifie que le projet compile |
+| `release.yml` | Push d'un tag `v*` | Archive + publie le `.app` sur GitHub Releases |
+
+```bash
+git tag v2.2.0
+git push origin v2.2.0
+```
 
 ---
 
 ## Pistes d'évolution
 
-- [ ] Support des dépôts GitHub privés (token OAuth)
-- [ ] Sync iCloud (remplacer FileManager local par container iCloud)
-- [ ] Raccourci menu bar (NSStatusItem)
-- [ ] Mode présentation plein écran
+- [ ] Sync iCloud
 - [ ] Import depuis GitLab / Bitbucket
-- [ ] Port iPhone & iPad (iOS 17+)
-
----
-
-## Contribution
-
-Les contributions sont les bienvenues. Pour proposer une modification :
-
-1. Fork le dépôt
-2. Crée une branche (`git checkout -b feature/ma-fonctionnalite`)
-3. Commit tes changements (`git commit -m 'Ajout de ma fonctionnalité'`)
-4. Push (`git push origin feature/ma-fonctionnalite`)
-5. Ouvre une Pull Request
+- [ ] Mode présentation plein écran
+- [ ] Raccourcis Siri (iOS)
+- [ ] Widget iOS
 
 ---
 
