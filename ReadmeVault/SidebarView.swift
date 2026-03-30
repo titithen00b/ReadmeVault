@@ -8,6 +8,7 @@ struct SidebarView: View {
     @Binding var showBulkImportSheet: Bool
     @Binding var showFileImportPicker: Bool
     @State private var selectedIDs: Set<UUID> = []
+    @State private var lastTappedIndex: Int? = nil
     @State private var draggingID: UUID? = nil
 
     private func deleteSelected() {
@@ -143,7 +144,7 @@ struct SidebarView: View {
             } else {
                 ScrollView {
                     VStack(spacing: 0) {
-                        ForEach(store.filteredProjects) { project in
+                        ForEach(Array(store.filteredProjects.enumerated()), id: \.element.id) { index, project in
                             ProjectRowView(
                                 project: project,
                                 isSelected: selectedIDs.count > 1
@@ -155,16 +156,29 @@ struct SidebarView: View {
                                 .contentShape(Rectangle())
                                 .onTapGesture {
                                     let isCmd = NSEvent.modifierFlags.contains(.command)
-                                    if isCmd {
+                                    let isShift = NSEvent.modifierFlags.contains(.shift)
+                                    if isShift, let last = lastTappedIndex {
+                                        let projects = store.filteredProjects
+                                        let range = min(last, index)...max(last, index)
+                                        let rangeIDs = Set(range.map { projects[$0].id })
+                                        if selectedIDs.contains(project.id) {
+                                            selectedIDs.subtract(rangeIDs)
+                                        } else {
+                                            selectedIDs.formUnion(rangeIDs)
+                                            store.selectedProject = project
+                                        }
+                                    } else if isCmd {
                                         if selectedIDs.contains(project.id) {
                                             selectedIDs.remove(project.id)
                                         } else {
                                             selectedIDs.insert(project.id)
                                             store.selectedProject = project
                                         }
+                                        lastTappedIndex = index
                                     } else {
                                         selectedIDs = [project.id]
                                         store.selectedProject = project
+                                        lastTappedIndex = index
                                     }
                                 }
                                 .ifManualSort(store.sortOrder == .manual) {

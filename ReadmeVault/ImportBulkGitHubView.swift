@@ -10,6 +10,7 @@ struct ImportBulkGitHubView: View {
     @State private var step: Step = .token
     @State private var repos: [GitHubRepoSummary] = []
     @State private var selectedIDs: Set<Int> = []
+    @State private var lastTappedIndex: Int? = nil
     @State private var error: String? = nil
     @State private var progress: (current: Int, total: Int) = (0, 0)
     @State private var importedCount = 0
@@ -207,13 +208,9 @@ struct ImportBulkGitHubView: View {
                 .font(.system(size: 13))
 
             VStack(spacing: 4) {
-                ForEach(filteredRepos) { repo in
+                ForEach(Array(filteredRepos.enumerated()), id: \.element.id) { index, repo in
                     RepoRowView(repo: repo, isSelected: selectedIDs.contains(repo.id)) {
-                        if selectedIDs.contains(repo.id) {
-                            selectedIDs.remove(repo.id)
-                        } else {
-                            selectedIDs.insert(repo.id)
-                        }
+                        handleTap(repo: repo, index: index)
                     }
                 }
             }
@@ -260,6 +257,31 @@ struct ImportBulkGitHubView: View {
     }
 
     // MARK: - Actions
+
+    func handleTap(repo: GitHubRepoSummary, index: Int) {
+        #if os(macOS)
+        let shiftHeld = NSEvent.modifierFlags.contains(.shift)
+        #else
+        let shiftHeld = false
+        #endif
+
+        if shiftHeld, let last = lastTappedIndex {
+            let range = min(last, index)...max(last, index)
+            let rangeIDs = Set(range.map { filteredRepos[$0].id })
+            if selectedIDs.contains(repo.id) {
+                selectedIDs.subtract(rangeIDs)
+            } else {
+                selectedIDs.formUnion(rangeIDs)
+            }
+        } else {
+            if selectedIDs.contains(repo.id) {
+                selectedIDs.remove(repo.id)
+            } else {
+                selectedIDs.insert(repo.id)
+            }
+            lastTappedIndex = index
+        }
+    }
 
     func toggleSelectAll() {
         if selectedIDs.count == repos.count {
