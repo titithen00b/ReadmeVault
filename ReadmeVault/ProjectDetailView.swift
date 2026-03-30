@@ -10,6 +10,7 @@ struct ProjectDetailView: View {
     @State private var showDeleteConfirm = false
     @State private var isRefreshing = false
     @State private var refreshError: String? = nil
+    @State private var showTokenSheet = false
     @State private var copied = false
     @State private var exportPDFTrigger = false
 
@@ -92,21 +93,7 @@ struct ProjectDetailView: View {
                     // Refresh depuis GitHub
                     if project.gitURL.contains("github.com") {
                         Button {
-                            isRefreshing = true
-                            refreshError = nil
-                            Task {
-                                do {
-                                    let updated = try await store.importFromGitHub(url: project.gitURL)
-                                    var refreshed = project
-                                    refreshed.readme = updated.readme
-                                    refreshed.description = updated.description
-                                    refreshed.tags = updated.tags
-                                    store.update(refreshed)
-                                } catch {
-                                    refreshError = error.localizedDescription
-                                }
-                                isRefreshing = false
-                            }
+                            Task { await doRefresh() }
                         } label: {
                             Image(systemName: isRefreshing ? "arrow.triangle.2.circlepath" : "arrow.clockwise")
                                 .font(.system(size: 13, weight: .medium))
@@ -121,6 +108,11 @@ struct ProjectDetailView: View {
                         .buttonStyle(.plain)
                         .disabled(isRefreshing)
                         .help("Rafraîchir le README depuis GitHub")
+                        .sheet(isPresented: $showTokenSheet) {
+                            TokenInputView(token: $store.githubToken) {
+                                Task { await doRefresh() }
+                            }
+                        }
                     }
                 }
 
@@ -260,6 +252,85 @@ struct ProjectDetailView: View {
         } message: {
             Text("Cette action est irréversible.")
         }
+    }
+
+    @MainActor
+    func doRefresh() async {
+        isRefreshing = true
+        refreshError = nil
+        do {
+            let updated = try await store.refreshFromGitHub(project: project)
+            store.update(updated)
+        } catch ImportError.unauthorized {
+            showTokenSheet = true
+        } catch {
+            refreshError = error.localizedDescription
+        }
+        isRefreshing = false
+    }
+}
+
+struct TokenInputView: View {
+    @Environment(\.dismiss) var dismiss
+    @Binding var token: String
+    let onSave: () -> Void
+    @State private var draft = ""
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Token GitHub requis")
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                    Text("Ce repo est privé ou nécessite une authentification")
+                        .font(.system(size: 12))
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+                Button { dismiss() } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 20))
+                        .foregroundColor(.secondary.opacity(0.6))
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(24)
+
+            Divider()
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Personal Access Token")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(.secondary)
+                SecureField("ghp_xxxxxxxxxxxxxxxxxxxx", text: $draft)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.system(size: 13, design: .monospaced))
+                Text("github.com → Settings → Developer settings → Personal access tokens → scope \"repo\"")
+                    .font(.system(size: 11))
+                    .foregroundColor(.secondary.opacity(0.7))
+            }
+            .padding(24)
+
+            Divider()
+
+            HStack {
+                Spacer()
+                Button("Annuler") { dismiss() }
+                    .keyboardShortcut(.escape)
+                Button("Enregistrer et rafraîchir") {
+                    token = draft
+                    dismiss()
+                    onSave()
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(Color(hex: "#6C63FF"))
+                .disabled(draft.isEmpty)
+                .keyboardShortcut(.return, modifiers: .command)
+            }
+            .padding(20)
+        }
+        .frame(width: 480, height: 240)
+        .onAppear { draft = token }
     }
 }
 

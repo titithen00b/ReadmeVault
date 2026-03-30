@@ -101,6 +101,11 @@ class ProjectStore: ObservableObject {
     @Published var selectedTag: String? = nil
     @Published var sortOrder: SortOrder = .updatedDesc
 
+    var githubToken: String {
+        get { UserDefaults.standard.string(forKey: "github_pat") ?? "" }
+        set { UserDefaults.standard.set(newValue, forKey: "github_pat") }
+    }
+
     // MARK: - Chemins de stockage
 
     private var baseURL: URL {
@@ -278,6 +283,47 @@ class ProjectStore: ObservableObject {
             tags: tags,
             color: randomColor
         )
+    }
+
+    func refreshFromGitHub(project: Project) async throws -> Project {
+        let cleaned = project.gitURL
+            .replacingOccurrences(of: "https://github.com/", with: "")
+            .replacingOccurrences(of: "http://github.com/", with: "")
+            .trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        let parts = cleaned.split(separator: "/")
+        guard parts.count >= 2 else { throw ImportError.invalidURL }
+        let fullName = "\(parts[0])/\(parts[1])"
+
+        var repoRequest = URLRequest(url: URL(string: "https://api.github.com/repos/\(fullName)")!)
+        repoRequest.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+        if !githubToken.isEmpty {
+            repoRequest.setValue("Bearer \(githubToken)", forHTTPHeaderField: "Authorization")
+        }
+        let (repoData, repoResponse) = try await URLSession.shared.data(for: repoRequest)
+        if let http = repoResponse as? HTTPURLResponse, http.statusCode == 401 {
+            throw ImportError.unauthorized
+        }
+        let repoInfo = try JSONDecoder().decode(GitHubRepo.self, from: repoData)
+
+        var readmeContent = project.readme
+        var readmeRequest = URLRequest(url: URL(string: "https://api.github.com/repos/\(fullName)/readme")!)
+        readmeRequest.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+        if !githubToken.isEmpty {
+            readmeRequest.setValue("Bearer \(githubToken)", forHTTPHeaderField: "Authorization")
+        }
+        if let (readmeData, _) = try? await URLSession.shared.data(for: readmeRequest),
+           let readmeJSON = try? JSONDecoder().decode(GitHubReadme.self, from: readmeData),
+           let decoded = Data(base64Encoded: readmeJSON.content.replacingOccurrences(of: "\n", with: "")),
+           let text = String(data: decoded, encoding: .utf8) {
+            readmeContent = text
+        }
+
+        let topics = repoInfo.topics ?? []
+        var updated = project
+        updated.description = repoInfo.description ?? project.description
+        updated.readme = readmeContent
+        updated.tags = extractTags(fromTopics: topics, readme: readmeContent)
+        return updated
     }
 
     func fetchUserRepos(token: String) async throws -> [GitHubRepoSummary] {

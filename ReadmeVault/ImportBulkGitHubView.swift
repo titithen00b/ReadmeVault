@@ -121,6 +121,8 @@ struct ImportBulkGitHubView: View {
             .padding(20)
         }
         .frame(width: 580, height: 520)
+        .onAppear { if token.isEmpty { token = store.githubToken } }
+        .onChange(of: token) { store.githubToken = token }
     }
 
     // MARK: - Token
