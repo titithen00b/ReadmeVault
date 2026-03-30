@@ -268,13 +268,14 @@ class ProjectStore: ObservableObject {
         let randomColor = colors.randomElement() ?? "#6C63FF"
 
         let title = extractTitle(from: readmeContent) ?? repoInfo.name
+        let tags = extractTags(fromTopics: repoInfo.topics ?? [], readme: readmeContent)
 
         return Project(
             name: title,
             description: repoInfo.description ?? "",
             readme: readmeContent,
             gitURL: repoInfo.html_url,
-            tags: repoInfo.topics ?? [],
+            tags: tags,
             color: randomColor
         )
     }
@@ -318,14 +319,32 @@ class ProjectStore: ObservableObject {
 
         let colors = ["#6C63FF", "#FF6584", "#43D9AD", "#F7B731", "#4ECDC4", "#FF6B6B", "#A29BFE"]
         let title = extractTitle(from: readmeContent) ?? repoInfo.name
+        let topics = repoInfo.topics ?? summary.topics ?? []
+        let tags = extractTags(fromTopics: topics, readme: readmeContent)
         return Project(
             name: title,
             description: repoInfo.description ?? "",
             readme: readmeContent,
             gitURL: repoInfo.html_url,
-            tags: repoInfo.topics ?? summary.topics ?? [],
+            tags: tags,
             color: colors.randomElement() ?? "#6C63FF"
         )
+    }
+
+    private func extractTags(fromTopics topics: [String], readme: String) -> [String] {
+        if !topics.isEmpty { return topics }
+        let keywords = [
+            "swift", "swiftui", "uikit", "python", "javascript", "typescript",
+            "react", "vue", "angular", "nextjs", "nuxt", "svelte",
+            "node", "express", "django", "flask", "fastapi", "rails",
+            "go", "rust", "java", "kotlin", "flutter", "dart", "php", "laravel",
+            "docker", "kubernetes", "aws", "gcp", "azure",
+            "postgresql", "mysql", "mongodb", "redis", "sqlite", "graphql",
+            "ios", "android", "macos", "linux",
+            "tailwind", "sass", "webpack", "vite", "terraform"
+        ]
+        let lowercased = readme.lowercased()
+        return keywords.filter { lowercased.contains($0) }.prefix(6).map { $0 }
     }
 
     private func extractTitle(from markdown: String) -> String? {
