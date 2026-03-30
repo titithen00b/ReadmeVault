@@ -77,6 +77,30 @@ Rends-toi sur la page [Releases](https://github.com/Titithen00b/ReadmeVault/rele
 
 > Première ouverture : clic droit → **Ouvrir** pour bypasser Gatekeeper.
 
+### ⚠️ App non signée — étapes obligatoires
+
+L'app est distribuée sans signature Apple. Après avoir copié `ReadmeVault.app` dans `/Applications` :
+
+**1. Retirer le flag de quarantaine**
+
+```bash
+xattr -cr /Applications/ReadmeVault.app
+```
+
+**2. Forcer l'enregistrement auprès de macOS**
+
+```bash
+/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister -f /Applications/ReadmeVault.app
+```
+
+**3. Relancer le Dock / Launchpad**
+
+```bash
+killall Dock
+```
+
+> Après ces trois commandes, ReadmeVault apparaît dans le Launchpad et s'ouvre normalement.
+
 ### macOS — Build depuis les sources
 
 ```bash
