@@ -5,6 +5,7 @@ struct SidebarView: View {
     @EnvironmentObject var store: ProjectStore
     @Binding var showAddSheet: Bool
     @Binding var showImportSheet: Bool
+    @Binding var showBulkImportSheet: Bool
     @Binding var showFileImportPicker: Bool
     @State private var selectedIDs: Set<UUID> = []
     @State private var draggingID: UUID? = nil
@@ -201,8 +202,17 @@ struct SidebarView: View {
                     .buttonStyle(.bordered)
                     .tint(.red)
                 } else {
-                    Button {
-                        showImportSheet = true
+                    Menu {
+                        Button {
+                            showImportSheet = true
+                        } label: {
+                            Label("Importer un repo", systemImage: "arrow.down.circle")
+                        }
+                        Button {
+                            showBulkImportSheet = true
+                        } label: {
+                            Label("Import en masse", systemImage: "tray.and.arrow.down")
+                        }
                     } label: {
                         Label("Importer GitHub", systemImage: "arrow.down.circle")
                             .font(.system(size: 12, weight: .medium))

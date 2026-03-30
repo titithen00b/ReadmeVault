@@ -1,0 +1,51 @@
+# WIP - Génération IPA iOS pour AltStore/SideStore
+# Ce workflow est désactivé (préfixe _wip_)
+# Pour l'activer : renommer en release-ios.yml
+
+# on:
+#   push:
+#     tags:
+#       - 'v*'
+
+name: Release iOS IPA (WIP)
+
+on:
+  workflow_dispatch: # Déclenchement manuel uniquement
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  release-ios:
+    name: Générer IPA iOS
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Build iOS IPA
+        run: |
+          xcodebuild \
+            -project ReadmeVault.xcodeproj \
+            -scheme ReadMeVault \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/ReadMeVault.xcarchive \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            archive
+          mkdir -p build/Payload
+          cp -r build/ReadMeVault.xcarchive/Products/Applications/ReadMeVault.app build/Payload/
+          cd build && zip -r ../ReadMeVault.ipa Payload/
+
+      - name: Uploader l'IPA sur la release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ReadMeVault.ipa
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

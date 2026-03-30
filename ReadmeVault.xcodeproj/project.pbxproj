@@ -20,6 +20,7 @@
 		A011 /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B011 /* HelpView.swift */; };
 		A012 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B012 /* MenuBarView.swift */; };
 		A013 /* SharedViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B013 /* SharedViews.swift */; };
+		A014 /* ImportBulkGitHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B014 /* ImportBulkGitHubView.swift */; };
 		BC7DFF0B2F79988900D65539 /* ProjectStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B003 /* ProjectStore.swift */; };
 		BC7DFF0C2F7998CD00D65539 /* MarkdownRendererView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B006 /* MarkdownRendererView.swift */; };
 		BC7DFF0D2F7998CD00D65539 /* ImportGitHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B008 /* ImportGitHubView.swift */; };
@@ -41,6 +42,7 @@
 		B011 /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
 		B012 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
 		B013 /* SharedViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedViews.swift; sourceTree = "<group>"; };
+		B014 /* ImportBulkGitHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportBulkGitHubView.swift; sourceTree = "<group>"; };
 		BC3AFBEC2F79930E00206453 /* ReadMeVault.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReadMeVault.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		PROD /* ReadmeVault.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReadmeVault.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -103,6 +105,7 @@
 				B011 /* HelpView.swift */,
 				B012 /* MenuBarView.swift */,
 				B013 /* SharedViews.swift */,
+				B014 /* ImportBulkGitHubView.swift */,
 				B009 /* Assets.xcassets */,
 			);
 			path = ReadmeVault;
@@ -244,6 +247,7 @@
 				A011 /* HelpView.swift in Sources */,
 				A012 /* MenuBarView.swift in Sources */,
 				A013 /* SharedViews.swift in Sources */,
+				A014 /* ImportBulkGitHubView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

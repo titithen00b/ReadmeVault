@@ -279,6 +279,55 @@ class ProjectStore: ObservableObject {
         )
     }
 
+    func fetchUserRepos(token: String) async throws -> [GitHubRepoSummary] {
+        var allRepos: [GitHubRepoSummary] = []
+        var page = 1
+        while true {
+            var request = URLRequest(url: URL(string: "https://api.github.com/user/repos?per_page=100&page=\(page)&type=all&sort=updated")!)
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+            let (data, response) = try await URLSession.shared.data(for: request)
+            if let http = response as? HTTPURLResponse, http.statusCode == 401 {
+                throw ImportError.unauthorized
+            }
+            let repos = try JSONDecoder().decode([GitHubRepoSummary].self, from: data)
+            if repos.isEmpty { break }
+            allRepos.append(contentsOf: repos)
+            page += 1
+        }
+        return allRepos
+    }
+
+    func importRepoWithToken(summary: GitHubRepoSummary, token: String) async throws -> Project {
+        var repoRequest = URLRequest(url: URL(string: "https://api.github.com/repos/\(summary.full_name)")!)
+        repoRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        repoRequest.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+        let (repoData, _) = try await URLSession.shared.data(for: repoRequest)
+        let repoInfo = try JSONDecoder().decode(GitHubRepo.self, from: repoData)
+
+        var readmeContent = "# \(summary.name)\n\nAucun README trouvé."
+        var readmeRequest = URLRequest(url: URL(string: "https://api.github.com/repos/\(summary.full_name)/readme")!)
+        readmeRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        readmeRequest.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+        if let (readmeData, _) = try? await URLSession.shared.data(for: readmeRequest),
+           let readmeJSON = try? JSONDecoder().decode(GitHubReadme.self, from: readmeData),
+           let decoded = Data(base64Encoded: readmeJSON.content.replacingOccurrences(of: "\n", with: "")),
+           let text = String(data: decoded, encoding: .utf8) {
+            readmeContent = text
+        }
+
+        let colors = ["#6C63FF", "#FF6584", "#43D9AD", "#F7B731", "#4ECDC4", "#FF6B6B", "#A29BFE"]
+        let title = extractTitle(from: readmeContent) ?? repoInfo.name
+        return Project(
+            name: title,
+            description: repoInfo.description ?? "",
+            readme: readmeContent,
+            gitURL: repoInfo.html_url,
+            tags: repoInfo.topics ?? summary.topics ?? [],
+            color: colors.randomElement() ?? "#6C63FF"
+        )
+    }
+
     private func extractTitle(from markdown: String) -> String? {
         return markdown
             .components(separatedBy: "\n")
@@ -426,12 +475,14 @@ enum ImportError: LocalizedError {
     case invalidURL
     case networkError
     case notFound
+    case unauthorized
 
     var errorDescription: String? {
         switch self {
         case .invalidURL: return "URL GitHub invalide"
         case .networkError: return "Erreur réseau"
         case .notFound: return "Dépôt introuvable"
+        case .unauthorized: return "Token invalide ou expiré"
         }
     }
 }
@@ -447,6 +498,18 @@ struct GitHubRepo: Codable {
 
 struct GitHubReadme: Codable {
     let content: String
+}
+
+struct GitHubRepoSummary: Codable, Identifiable {
+    let id: Int
+    let name: String
+    let full_name: String
+    let description: String?
+    let html_url: String
+    let `private`: Bool
+    let topics: [String]?
+
+    var owner: String { String(full_name.split(separator: "/")[0]) }
 }
 
 // MARK: - Extension Color

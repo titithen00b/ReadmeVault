@@ -6,6 +6,7 @@ struct ContentView: View {
     @EnvironmentObject var store: ProjectStore
     @State private var showAddSheet = false
     @State private var showImportSheet = false
+    @State private var showBulkImportSheet = false
     @State private var showFileImportPicker = false
     @State private var fileImportData: (content: String, filename: String)? = nil
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
@@ -22,6 +23,7 @@ struct ContentView: View {
             SidebarView(
                 showAddSheet: $showAddSheet,
                 showImportSheet: $showImportSheet,
+                showBulkImportSheet: $showBulkImportSheet,
                 showFileImportPicker: $showFileImportPicker
             )
             .navigationSplitViewColumnWidth(min: 240, ideal: 280, max: 320)
@@ -37,6 +39,10 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showImportSheet) {
             ImportGitHubView()
+        }
+        .sheet(isPresented: $showBulkImportSheet) {
+            ImportBulkGitHubView()
+                .environmentObject(store)
         }
         .sheet(isPresented: showImportFormSheet) {
             if let data = fileImportData {
